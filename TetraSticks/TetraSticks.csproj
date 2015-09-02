@@ -76,7 +76,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Model\Orientation.cs" />
     <Compile Include="Model\Coords.cs" />
+    <Compile Include="Model\RotatedTetraStick.cs" />
     <Compile Include="Model\TetraStick.cs" />
     <Compile Include="Model\TetraSticks.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">

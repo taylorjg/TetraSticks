@@ -28,6 +28,12 @@ namespace TetraSticks
                 DrawLine(line.ToArray());
         }
 
+        public void DrawRotatedTetraStick(RotatedTetraStick rotatedTetraStick)
+        {
+            foreach (var line in rotatedTetraStick.Lines)
+                DrawLine(line.ToArray());
+        }
+
         private void DrawLine(params Coords[] pts)
         {
             var aw = ActualWidth;
