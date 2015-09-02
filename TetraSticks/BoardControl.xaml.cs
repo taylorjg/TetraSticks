@@ -1,12 +1,12 @@
 ﻿using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using TetraSticks.Model;
 
 namespace TetraSticks
 {
-    public partial class BoardControl : UserControl
+    public partial class BoardControl
     {
         private readonly Color _gridColour = Color.FromArgb(0x80, 0xCD, 0x85, 0x3F);
         private const int GridLineThickness = 4;
@@ -22,8 +22,13 @@ namespace TetraSticks
             DrawGridLines();
         }
 
-        // PointCollection pts ???
-        public void DrawLine(params Point[] pts)
+        public void DrawTetraStick(TetraStick tetraStick)
+        {
+            foreach (var line in tetraStick.Lines)
+                DrawLine(line.ToArray());
+        }
+
+        private void DrawLine(params Coords[] pts)
         {
             var aw = ActualWidth;
             var ah = ActualHeight;
@@ -46,50 +51,6 @@ namespace TetraSticks
                 Data = pathGeometry
             };
             BoardCanvas.Children.Add(path);
-        }
-
-        public void DrawSegmentHorizontal(Point pt)
-        {
-            var aw = ActualWidth;
-            var ah = ActualHeight;
-            var sw = (aw - GridLineThickness) / 5;
-            var sh = (ah - GridLineThickness) / 5;
-
-            var segment = new Line
-            {
-                Stroke = new SolidColorBrush(Colors.BlueViolet),
-                StrokeThickness = GridLineThickness*2,
-                X1 = 0,
-                Y1 = 0,
-                X2 = sw,
-                Y2 = 0
-            };
-            Canvas.SetLeft(segment, pt.X * sw + GridLineHalfThickness);
-            Canvas.SetBottom(segment, pt.Y * sh - GridLineHalfThickness);
-            BoardCanvas.Children.Add(segment);
-            //_pieceDetails[rotatedPiece.Piece.Name] = Tuple.Create(rotatedPiece.Orientation, x, y, pieceControl);
-        }
-
-        public void DrawSegmentVertical(Point pt)
-        {
-            var aw = ActualWidth;
-            var ah = ActualHeight;
-            var sw = (aw - GridLineThickness) / 5;
-            var sh = (ah - GridLineThickness) / 5;
-
-            var segment = new Line
-            {
-                Stroke = new SolidColorBrush(Colors.BlueViolet),
-                StrokeThickness = GridLineThickness*2,
-                X1 = 0,
-                Y1 = 0,
-                X2 = 0,
-                Y2 = sh
-            };
-            Canvas.SetLeft(segment, pt.X * sw + GridLineHalfThickness);
-            Canvas.SetBottom(segment, pt.Y * sh + GridLineHalfThickness);
-            BoardCanvas.Children.Add(segment);
-            //_pieceDetails[rotatedPiece.Piece.Name] = Tuple.Create(rotatedPiece.Orientation, x, y, pieceControl);
         }
 
         private void DrawGridLines()

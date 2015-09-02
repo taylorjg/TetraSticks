@@ -1,8 +1,8 @@
-﻿using System.Windows;
+﻿using System.Linq;
 
 namespace TetraSticks
 {
-    public partial class MainWindow : Window
+    public partial class MainWindow
     {
         public MainWindow()
         {
@@ -11,20 +11,8 @@ namespace TetraSticks
             {
                 BoardControl.DrawGrid();
 
-                BoardControl.DrawSegmentHorizontal(new Point(3, 3));
-
-                BoardControl.DrawSegmentVertical(new Point(4, 1));
-
-                BoardControl.DrawLine(
-                    new Point(0, 0),
-                    new Point(1, 0),
-                    new Point(1, 1),
-                    new Point(2, 1));
-
-                BoardControl.DrawLine(new Point(1, 4), new Point(1, 5));
-                BoardControl.DrawLine(new Point(1, 4), new Point(1, 3));
-                BoardControl.DrawLine(new Point(1, 4), new Point(0, 4));
-                BoardControl.DrawLine(new Point(1, 4), new Point(2, 4));
+                var f = Model.TetraSticks.All.First();
+                BoardControl.DrawTetraStick(f);
             };
         }
     }
