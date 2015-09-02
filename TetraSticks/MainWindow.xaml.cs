@@ -11,8 +11,8 @@ namespace TetraSticks
             {
                 BoardControl.DrawGrid();
 
-                var f = Model.TetraSticks.All.First();
-                BoardControl.DrawTetraStick(f);
+                var tetraStick = Model.TetraSticks.All.First(ts => ts.Tag == "Z");
+                BoardControl.DrawTetraStick(tetraStick);
             };
         }
     }
