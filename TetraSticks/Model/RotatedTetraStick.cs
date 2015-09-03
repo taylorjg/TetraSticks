@@ -13,10 +13,12 @@ namespace TetraSticks.Model
             Reflected = reflected;
             _lazyWidth = new Lazy<int>(CalculateWidth);
             _lazyHeight = new Lazy<int>(CalculateHeight);
+            _lazyInteriorJunctionPoints = new Lazy<IEnumerable<Coords>>(CalculateInteriorJunctionPoints);
             _lazyLines = new Lazy<IEnumerable<IEnumerable<Coords>>>(CalculateLines);
         }
 
         public string Tag => TetraStick.Tag;
+        public IEnumerable<Coords> InteriorJunctionPoints => _lazyInteriorJunctionPoints.Value;
         public IEnumerable<IEnumerable<Coords>> Lines => _lazyLines.Value;
         private TetraStick TetraStick { get; }
         private Orientation Orientation { get; }
@@ -52,6 +54,7 @@ namespace TetraSticks.Model
 
         private readonly Lazy<int> _lazyWidth;
         private readonly Lazy<int> _lazyHeight;
+        private readonly Lazy<IEnumerable<Coords>> _lazyInteriorJunctionPoints;
         private readonly Lazy<IEnumerable<IEnumerable<Coords>>> _lazyLines;
 
         private int CalculateWidth()
@@ -84,6 +87,11 @@ namespace TetraSticks.Model
             }
 
             return maxX - minX;
+        }
+
+        private IEnumerable<Coords> CalculateInteriorJunctionPoints()
+        {
+            return TetraStick.InteriorJunctionPoints.Select(TransformCoords);
         }
 
         private IEnumerable<IEnumerable<Coords>> CalculateLines()

@@ -13,11 +13,11 @@ he discusses puzzles involving 15 of the 16 possible tetra sticks in a 5 x 5 squ
 
 - ~~get basic grid working~~
   - ~~draw empty grid~~
-- model a tetra stick
-  - each tetra stick will have:
+- ~~model a tetra stick~~
+  - ~~each tetra stick will have:~~
     - ~~a tag~~
     - ~~a list of lines each of which is a list of segments~~
-    - a list of interior junction points
+    - ~~a list of interior junction points~~
 - ~~model all 16 tetra sticks~~
 - ~~draw a tetra stick~~
   - ~~draw a line segment (0, 0) => (1, 0)~~

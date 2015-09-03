@@ -13,6 +13,7 @@ namespace TetraSticks.Model
 
         public static TetraStick F => new TetraStick(
             "F",
+            new Coords[] {},
             new[]
             {
                 new Coords(0, 0),
@@ -29,6 +30,7 @@ namespace TetraSticks.Model
 
         public static TetraStick H => new TetraStick(
             "H",
+            new Coords[] { },
             new[]
             {
                 new Coords(0, 0),
@@ -49,6 +51,12 @@ namespace TetraSticks.Model
             "I",
             new[]
             {
+                new Coords(0, 1),
+                new Coords(0, 2),
+                new Coords(0, 3)
+            },
+            new[]
+            {
                 new Coords(0, 0),
                 new Coords(0, 1),
                 new Coords(0, 2),
@@ -58,6 +66,10 @@ namespace TetraSticks.Model
 
         public static TetraStick J => new TetraStick(
             "J",
+            new[]
+            {
+                new Coords(1, 1)
+            },
             new[]
             {
                 new Coords(0, 1),
@@ -71,6 +83,11 @@ namespace TetraSticks.Model
             "L",
             new[]
             {
+                new Coords(0, 2),
+                new Coords(0, 1)
+            },
+            new[]
+            {
                 new Coords(0, 3),
                 new Coords(0, 2),
                 new Coords(0, 1),
@@ -82,6 +99,10 @@ namespace TetraSticks.Model
             "N",
             new[]
             {
+                new Coords(1, 2)
+            },
+            new[]
+            {
                 new Coords(0, 0),
                 new Coords(0, 1),
                 new Coords(1, 1),
@@ -91,6 +112,7 @@ namespace TetraSticks.Model
 
         public static TetraStick O => new TetraStick(
             "O",
+            new Coords[] { },
             new[]
             {
                 new Coords(0, 0),
@@ -102,6 +124,7 @@ namespace TetraSticks.Model
 
         public static TetraStick P => new TetraStick(
             "P",
+            new Coords[] { },
             new[]
             {
                 new Coords(0, 0),
@@ -113,6 +136,7 @@ namespace TetraSticks.Model
 
         public static TetraStick R => new TetraStick(
             "R",
+            new Coords[] { },
             new[]
             {
                 new Coords(1, 0),
@@ -129,6 +153,10 @@ namespace TetraSticks.Model
 
         public static TetraStick T => new TetraStick(
             "T",
+            new[]
+            {
+                new Coords(1, 1)
+            },
             new[]
             {
                 new Coords(0, 2),
@@ -148,6 +176,10 @@ namespace TetraSticks.Model
             "U",
             new[]
             {
+                new Coords(1, 0)
+            },
+            new[]
+            {
                 new Coords(0, 1),
                 new Coords(0, 0),
                 new Coords(1, 0),
@@ -159,6 +191,11 @@ namespace TetraSticks.Model
             "V",
             new[]
             {
+                new Coords(1, 0),
+                new Coords(2, 1)
+            },
+            new[]
+            {
                 new Coords(0, 0),
                 new Coords(1, 0),
                 new Coords(2, 0),
@@ -168,6 +205,7 @@ namespace TetraSticks.Model
 
         public static TetraStick W => new TetraStick(
             "W",
+            new Coords[] { },
             new[]
             {
                 new Coords(0, 0),
@@ -179,6 +217,7 @@ namespace TetraSticks.Model
 
         public static TetraStick X => new TetraStick(
             "X",
+            new Coords[] { },
             new[]
             {
                 new Coords(0, 1),
@@ -196,6 +235,10 @@ namespace TetraSticks.Model
             "Y",
             new[]
             {
+                new Coords(1, 0)
+            },
+            new[]
+            {
                 new Coords(0, 0),
                 new Coords(1, 0),
                 new Coords(2, 0),
@@ -210,6 +253,10 @@ namespace TetraSticks.Model
 
         public static TetraStick Z => new TetraStick(
             "Z",
+            new[]
+            {
+                new Coords(1, 1)
+            },
             new[]
             {
                 new Coords(0, 2),
