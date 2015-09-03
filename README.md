@@ -11,7 +11,6 @@ he discusses puzzles involving 15 of the 16 possible tetra sticks in a 5 x 5 squ
 
 ## TODO: Implementation Steps
 
-- add basic graphical elements (grid, buttons, etc)
 - ~~get basic grid working~~
   - ~~draw empty grid~~
 - model a tetra stick
@@ -25,8 +24,9 @@ he discusses puzzles involving 15 of the 16 possible tetra sticks in a 5 x 5 squ
   - ~~draw with given location~~
   - ~~draw several line segments~~
   - ~~draw several lines (i.e. a whole tetra stick)~~
-  - ~~draw with given colour~~
+  - ~~draw with correct colour~~
   - ~~draw with given orientation~~
+  - ~~draw with given reflection mode~~
 - need to enumerate all possible locations for each tetra stick
   - with all possible orientations
 - need to be able to generate a matrix row for a given tetra stick/location/orientation
