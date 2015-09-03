@@ -22,12 +22,6 @@ namespace TetraSticks
             DrawGridLines();
         }
 
-        public void DrawTetraStick(TetraStick tetraStick)
-        {
-            foreach (var line in tetraStick.Lines)
-                DrawLine(line.ToArray());
-        }
-
         public void DrawRotatedTetraStick(RotatedTetraStick rotatedTetraStick)
         {
             foreach (var line in rotatedTetraStick.Lines)

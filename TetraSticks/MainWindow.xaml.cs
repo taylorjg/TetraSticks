@@ -1,4 +1,4 @@
-﻿using System.Linq;
+﻿using TetraSticks.Model;
 
 namespace TetraSticks
 {
@@ -11,8 +11,9 @@ namespace TetraSticks
             {
                 BoardControl.DrawGrid();
 
-                var tetraStick = Model.TetraSticks.All.First(ts => ts.Tag == "Z");
-                BoardControl.DrawTetraStick(tetraStick);
+                var tetraStick = Model.TetraSticks.H;
+                var rotatedTetraStick = new RotatedTetraStick(tetraStick, Orientation.North);
+                BoardControl.DrawRotatedTetraStick(rotatedTetraStick);
             };
         }
     }
