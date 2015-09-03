@@ -22,20 +22,26 @@ namespace TetraSticks.View
             DrawGridLines();
         }
 
-        public void DrawRotatedTetraStick(RotatedTetraStick rotatedTetraStick)
+        public void DrawRotatedTetraStick(RotatedTetraStick rotatedTetraStick, Coords location)
         {
+            var colour = TetraStickColours.TagToColour(rotatedTetraStick.Tag);
             foreach (var line in rotatedTetraStick.Lines)
-                DrawLine(line.ToArray());
+                DrawLine(colour, location, line.ToArray());
         }
 
-        private void DrawLine(params Coords[] pts)
+        private void DrawLine(Color colour, Coords location, params Coords[] coords)
         {
             var aw = ActualWidth;
             var ah = ActualHeight;
             var sw = (aw - GridLineThickness) / 5;
             var sh = (ah - GridLineThickness) / 5;
 
-            var transformedPts = pts.Select(pt => new Point(pt.X * sw + GridLineHalfThickness, (5 - pt.Y) * sh + GridLineHalfThickness)).ToList();
+            var transformedPts = coords
+                .Select(coord => new Point(
+                    (location.X + coord.X) * sw + GridLineHalfThickness,
+                    (5 - location.Y - coord.Y) * sh + GridLineHalfThickness))
+                .ToList();
+
             var polyLineSegment = new PolyLineSegment(transformedPts, true);
             var pathFigure = new PathFigure { StartPoint = transformedPts.First() };
             pathFigure.Segments.Add(polyLineSegment);
@@ -43,7 +49,7 @@ namespace TetraSticks.View
             pathGeometry.Figures.Add(pathFigure);
             var path = new Path
             {
-                Stroke = new SolidColorBrush(Colors.BlueViolet),
+                Stroke = new SolidColorBrush(colour),
                 StrokeThickness = GridLineThickness * 2,
                 StrokeStartLineCap = PenLineCap.Round,
                 StrokeEndLineCap = PenLineCap.Round,

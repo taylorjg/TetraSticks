@@ -52,7 +52,8 @@ namespace TetraSticks.Model
                 new Coords(0, 0),
                 new Coords(0, 1),
                 new Coords(0, 2),
-                new Coords(0, 3)
+                new Coords(0, 3),
+                new Coords(0, 4)
             });
 
         public static TetraStick J => new TetraStick(

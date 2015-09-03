@@ -16,7 +16,7 @@
     <Window.Background>
         <VisualBrush TileMode="Tile" Viewport="0,0,0.2,0.2">
             <VisualBrush.Visual>
-                <Image Source="Images\Pattern - Apple Wood@2x.png" />
+                <Image Source="..\Images\Pattern - Apple Wood@2x.png" />
             </VisualBrush.Visual>
         </VisualBrush>
     </Window.Background>

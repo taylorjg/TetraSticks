@@ -6,29 +6,53 @@ namespace TetraSticks.Model
 {
     public class RotatedTetraStick
     {
-        public RotatedTetraStick(TetraStick tetraStick, Orientation orientation)
+        public RotatedTetraStick(TetraStick tetraStick, Orientation orientation, bool reflected = false)
         {
             TetraStick = tetraStick;
             Orientation = orientation;
+            Reflected = reflected;
             _lazyWidth = new Lazy<int>(CalculateWidth);
             _lazyHeight = new Lazy<int>(CalculateHeight);
+            _lazyLines = new Lazy<IEnumerable<IEnumerable<Coords>>>(CalculateLines);
         }
 
-        public TetraStick TetraStick { get; }
-        public Orientation Orientation { get; }
-        public int Width => _lazyWidth.Value;
-        public int Height => _lazyHeight.Value;
+        public string Tag => TetraStick.Tag;
+        public IEnumerable<IEnumerable<Coords>> Lines => _lazyLines.Value;
+        private TetraStick TetraStick { get; }
+        private Orientation Orientation { get; }
+        private bool Reflected { get; }
+        private int Width => _lazyWidth.Value;
+        private int Height => _lazyHeight.Value;
 
-        public IEnumerable<Coords>[] Lines
+        private Coords TransformCoords(Coords coords)
         {
-            get
+            switch (Orientation)
             {
-                return TetraStick.Lines;
+                case Orientation.North:
+                    return ApplyReflectionMode(coords);
+
+                case Orientation.South:
+                    return ApplyReflectionMode(new Coords(Width - coords.X, Height - coords.Y));
+
+                case Orientation.East:
+                    return ApplyReflectionMode(new Coords(coords.Y, Height - coords.X));
+
+                case Orientation.West:
+                    return ApplyReflectionMode(new Coords(Width - coords.Y, coords.X));
+
+                default:
+                    throw new InvalidOperationException($"Unknown orientation, \"{Orientation}\".");
             }
+        }
+
+        private Coords ApplyReflectionMode(Coords coords)
+        {
+            return Reflected ? new Coords(Width - coords.X, coords.Y) : coords;
         }
 
         private readonly Lazy<int> _lazyWidth;
         private readonly Lazy<int> _lazyHeight;
+        private readonly Lazy<IEnumerable<IEnumerable<Coords>>> _lazyLines;
 
         private int CalculateWidth()
         {
@@ -60,6 +84,11 @@ namespace TetraSticks.Model
             }
 
             return maxX - minX;
+        }
+
+        private IEnumerable<IEnumerable<Coords>> CalculateLines()
+        {
+            return TetraStick.Lines.Select(line => line.Select(TransformCoords));
         }
     }
 }

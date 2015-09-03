@@ -19,14 +19,14 @@ he discusses puzzles involving 15 of the 16 possible tetra sticks in a 5 x 5 squ
     - ~~a tag~~
     - ~~a list of lines each of which is a list of segments~~
     - a list of interior junction points
-- model all 16 tetra sticks
-- draw a tetra stick
+- ~~model all 16 tetra sticks~~
+- ~~draw a tetra stick~~
   - ~~draw a line segment (0, 0) => (1, 0)~~
-  - draw with given location
+  - ~~draw with given location~~
   - ~~draw several line segments~~
   - ~~draw several lines (i.e. a whole tetra stick)~~
-  - draw with given colour
-  - draw with given orientation
+  - ~~draw with given colour~~
+  - ~~draw with given orientation~~
 - need to enumerate all possible locations for each tetra stick
   - with all possible orientations
 - need to be able to generate a matrix row for a given tetra stick/location/orientation
