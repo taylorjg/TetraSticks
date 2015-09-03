@@ -1,6 +1,6 @@
 ﻿using TetraSticks.Model;
 
-namespace TetraSticks
+namespace TetraSticks.View
 {
     public partial class MainWindow
     {

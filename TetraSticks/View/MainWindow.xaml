@@ -1,9 +1,10 @@
-﻿<Window x:Class="TetraSticks.MainWindow"
+﻿<Window x:Class="TetraSticks.View.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TetraSticks"
+        xmlns:view="clr-namespace:TetraSticks.View"
         mc:Ignorable="d"
         Title="TetraSticks"
         ResizeMode="NoResize"
@@ -23,7 +24,7 @@
     <StackPanel Margin="20" Orientation="Vertical">
 
         <Grid>
-            <local:BoardControl x:Name="BoardControl" Width="544" Height="544" />
+            <view:BoardControl x:Name="BoardControl" Width="544" Height="544" />
         </Grid>
 
         <DockPanel Margin="0,20,0,0" LastChildFill="True">

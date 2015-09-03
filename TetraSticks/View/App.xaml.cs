@@ -1,4 +1,4 @@
-﻿namespace TetraSticks
+﻿namespace TetraSticks.View
 {
     public partial class App
     {

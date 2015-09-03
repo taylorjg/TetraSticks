@@ -4,7 +4,7 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using TetraSticks.Model;
 
-namespace TetraSticks
+namespace TetraSticks.View
 {
     public partial class BoardControl
     {
