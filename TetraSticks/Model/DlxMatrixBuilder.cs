@@ -60,7 +60,7 @@ namespace TetraSticks.Model
                 }
             }
 
-            var arrs = new[] {arr1, arr2, arr3 /* , arr4 */};
+            var arrs = new[] {arr1, arr2, arr3, arr4};
 
             return arrs.SelectMany(arr => arr).ToImmutableList();
         }

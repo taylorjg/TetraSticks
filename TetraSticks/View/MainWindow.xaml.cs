@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.Linq;
 using DlxLib;
 using TetraSticks.Model;
@@ -20,7 +19,7 @@ namespace TetraSticks.View
                 var rows = RowBuilder.BuildRows(tetraSticks);
                 var matrix = DlxMatrixBuilder.BuildDlxMatrix(tetraSticks, rows);
                 var dlx = new Dlx();
-                var firstSolution = dlx.Solve(matrix, d => d, r => r).First();
+                var firstSolution = dlx.Solve(matrix, d => d, r => r, 75).First();
                 var solutionRows = firstSolution.RowIndexes.Select(idx => rows[idx]);
                 foreach (var row in solutionRows) BoardControl.DrawPlacedTetraStick(row);
             };

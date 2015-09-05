@@ -40,9 +40,9 @@ he discusses puzzles involving 15 of the 16 possible tetra sticks in a 5 x 5 squ
   - then solve on a background thread
   - then display a dialog box during solving
   - then add the ability to cancel the solving
-- extend DlxLib to support secondary columns
-- extend DLX matrix by adding secondary columns for the interior
-  junction points when these are not on the edges of the grid
+- ~~extend DlxLib to support secondary columns~~
+- ~~extend DLX matrix by adding secondary columns for the interior
+  junction points when these are not on the edges of the grid~~
 - add the ability to control which of the 16 tetra sticks should be omitted
   - simple dropdown showing the name of the tetra stick e.g. "L"
   - enhance this further by adding a tiny picture (with the correct colour)
