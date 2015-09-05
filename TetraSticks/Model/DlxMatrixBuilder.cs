@@ -98,20 +98,5 @@ namespace TetraSticks.Model
 
             throw new InvalidOperationException($"Found a segment that is not horizontal or vertical: ({pair.Item1}, {pair.Item2})");
         }
-
-        private class PlacedTetraStickComparer : IEqualityComparer<PlacedTetraStick>
-        {
-            public bool Equals(PlacedTetraStick x, PlacedTetraStick y)
-            {
-                var xPoints = x.Lines.SelectMany(line => line).Distinct().ToList();
-                var yPoints = y.Lines.SelectMany(line => line).Distinct().ToList();
-                return !xPoints.Except(yPoints).Any() && !yPoints.Except(xPoints).Any();
-            }
-
-            public int GetHashCode(PlacedTetraStick placedTetraStick)
-            {
-                return placedTetraStick.Tag.GetHashCode();
-            }
-        }
     }
 }

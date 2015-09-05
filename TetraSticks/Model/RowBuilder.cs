@@ -24,7 +24,7 @@ namespace TetraSticks.Model
                 where IsFullyWithinGrid(placedTetraStick)
                 select placedTetraStick;
 
-            return placedTetraSticks;
+            return placedTetraSticks.Distinct(new PlacedTetraStickComparer());
         }
 
         private static bool IsFullyWithinGrid(PlacedTetraStick placedTetraStick)
@@ -34,6 +34,22 @@ namespace TetraSticks.Model
                    location.Y >= 0 && location.Y < 5 &&
                    location.X + placedTetraStick.Width <= 5 &&
                    location.Y + placedTetraStick.Height <= 5;
+        }
+
+        private class PlacedTetraStickComparer : IEqualityComparer<PlacedTetraStick>
+        {
+            public bool Equals(PlacedTetraStick x, PlacedTetraStick y)
+            {
+                if (x.Tag != y.Tag) return false;
+                var xPoints = x.Lines.SelectMany(line => line).Distinct().ToList();
+                var yPoints = y.Lines.SelectMany(line => line).Distinct().ToList();
+                return !xPoints.Except(yPoints).Any() && !yPoints.Except(xPoints).Any();
+            }
+
+            public int GetHashCode(PlacedTetraStick placedTetraStick)
+            {
+                return placedTetraStick.Tag.GetHashCode();
+            }
         }
     }
 }
