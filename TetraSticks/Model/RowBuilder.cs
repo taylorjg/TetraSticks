@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 namespace TetraSticks.Model
 {
     public static class RowBuilder
     {
-        public static IEnumerable<PlacedTetraStick> BuildRows(IEnumerable<TetraStick> tetraSticks)
+        public static IImmutableList<PlacedTetraStick> BuildRows(IEnumerable<TetraStick> tetraSticks)
         {
             var locations =
                 (from x in Enumerable.Range(0, 5)
-                from y in Enumerable.Range(0, 5)
-                select new Coords(x, y)).ToList();
-            var orientations = Enum.GetValues(typeof (Orientation)).Cast<Orientation>().ToList();
-            var reflectionModes = Enum.GetValues(typeof (ReflectionMode)).Cast<ReflectionMode>().ToList();
+                    from y in Enumerable.Range(0, 5)
+                    select new Coords(x, y)).ToImmutableList();
+            var orientations = Enum.GetValues(typeof (Orientation)).Cast<Orientation>().ToImmutableList();
+            var reflectionModes = Enum.GetValues(typeof (ReflectionMode)).Cast<ReflectionMode>().ToImmutableList();
 
             var placedTetraSticks =
                 from tetraStick in tetraSticks
@@ -24,7 +25,7 @@ namespace TetraSticks.Model
                 where IsFullyWithinGrid(placedTetraStick)
                 select placedTetraStick;
 
-            return placedTetraSticks.Distinct(new PlacedTetraStickComparer());
+            return placedTetraSticks.Distinct(new PlacedTetraStickComparer()).ToImmutableList();
         }
 
         private static bool IsFullyWithinGrid(PlacedTetraStick placedTetraStick)
@@ -40,15 +41,15 @@ namespace TetraSticks.Model
         {
             public bool Equals(PlacedTetraStick x, PlacedTetraStick y)
             {
-                if (x.Tag != y.Tag) return false;
-                var xPoints = x.Lines.SelectMany(line => line).Distinct().ToList();
-                var yPoints = y.Lines.SelectMany(line => line).Distinct().ToList();
+                if (x.TetraStick.Tag != y.TetraStick.Tag) return false;
+                var xPoints = x.Lines.SelectMany(line => line).Distinct().ToImmutableList();
+                var yPoints = y.Lines.SelectMany(line => line).Distinct().ToImmutableList();
                 return !xPoints.Except(yPoints).Any() && !yPoints.Except(xPoints).Any();
             }
 
             public int GetHashCode(PlacedTetraStick placedTetraStick)
             {
-                return placedTetraStick.Tag.GetHashCode();
+                return placedTetraStick.TetraStick.Tag.GetHashCode();
             }
         }
     }

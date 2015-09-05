@@ -1,4 +1,7 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
+using DlxLib;
 using TetraSticks.Model;
 
 namespace TetraSticks.View
@@ -13,12 +16,11 @@ namespace TetraSticks.View
                 BoardControl.DrawGrid();
 
                 var tetraStickToOmit = Model.TetraSticks.L;
-                var tetraSticks = Model.TetraSticks.All.Where(ts => ts.Tag != tetraStickToOmit.Tag).ToList();
-                var rows = RowBuilder.BuildRows(tetraSticks).ToArray();
+                var tetraSticks = Model.TetraSticks.All.Where(ts => ts.Tag != tetraStickToOmit.Tag).ToImmutableList();
+                var rows = RowBuilder.BuildRows(tetraSticks);
                 var matrix = DlxMatrixBuilder.BuildDlxMatrix(tetraSticks, rows);
-                var dlx = new DlxLib.Dlx();
-                var solutions = dlx.Solve(matrix, d => d, r => r);
-                var firstSolution = solutions.First();
+                var dlx = new Dlx();
+                var firstSolution = dlx.Solve(matrix, d => d, r => r).First();
                 var solutionRows = firstSolution.RowIndexes.Select(idx => rows[idx]);
                 foreach (var row in solutionRows) BoardControl.DrawPlacedTetraStick(row);
             };

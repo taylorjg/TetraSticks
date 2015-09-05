@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Windows.Media;
+using TetraSticks.Model;
 
 namespace TetraSticks.View
 {
     public static class TetraStickColours
     {
-        public static Color TagToColour(string tag)
+        public static Color TetraStickToColour(TetraStick tetraStick)
         {
-            switch (tag)
+            switch (tetraStick.Tag)
             {
                 case "F":
                     return Color.FromRgb(0xFF, 0x73, 0x66);
@@ -42,7 +43,7 @@ namespace TetraSticks.View
                 case "Z":
                     return Color.FromRgb(0x00, 0x80, 0x00);
                 default:
-                    throw new InvalidOperationException($"Unknown tetra stick tag, \"{tag}\".");
+                    throw new InvalidOperationException($"Unknown tetra stick tag, \"{tetraStick.Tag}\".");
             }
         }
     }

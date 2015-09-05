@@ -1,18 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Immutable;
 
 namespace TetraSticks.Model
 {
     public class TetraStick
     {
-        public TetraStick(string tag, IEnumerable<Coords> interiorJunctionPoints, params IEnumerable<Coords>[] lines)
+        public TetraStick(string tag, IImmutableList<Coords> interiorJunctionPoints, params IImmutableList<Coords>[] lines)
         {
             Tag = tag;
-            Lines = lines;
             InteriorJunctionPoints = interiorJunctionPoints;
+            Lines = ImmutableList.CreateRange(lines);
         }
 
         public string Tag { get; }
-        public IEnumerable<Coords> InteriorJunctionPoints { get; }
-        public IEnumerable<Coords>[] Lines { get; }
+        public IImmutableList<Coords> InteriorJunctionPoints { get; }
+        public IImmutableList<IImmutableList<Coords>> Lines { get; }
     }
 }

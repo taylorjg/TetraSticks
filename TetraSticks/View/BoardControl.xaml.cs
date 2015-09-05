@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -24,12 +26,12 @@ namespace TetraSticks.View
 
         public void DrawPlacedTetraStick(PlacedTetraStick placedTetraStick)
         {
-            var colour = TetraStickColours.TagToColour(placedTetraStick.Tag);
+            var colour = TetraStickColours.TetraStickToColour(placedTetraStick.TetraStick);
             foreach (var line in placedTetraStick.Lines)
-                DrawLine(colour, line.ToArray());
+                DrawLine(colour, line);
         }
 
-        private void DrawLine(Color colour, params Coords[] coords)
+        private void DrawLine(Color colour, IEnumerable<Coords> coords)
         {
             var aw = ActualWidth;
             var ah = ActualHeight;
@@ -38,9 +40,9 @@ namespace TetraSticks.View
 
             var transformedPts = coords
                 .Select(coord => new Point(
-                    (coord.X) * sw + GridLineHalfThickness,
-                    (5 - coord.Y) * sh + GridLineHalfThickness))
-                .ToList();
+                    (coord.X)*sw + GridLineHalfThickness,
+                    (5 - coord.Y)*sh + GridLineHalfThickness))
+                .ToImmutableList();
 
             var polyLineSegment = new PolyLineSegment(transformedPts, true);
             var pathFigure = new PathFigure { StartPoint = transformedPts.First() };

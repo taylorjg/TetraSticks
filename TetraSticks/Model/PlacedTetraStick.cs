@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 namespace TetraSticks.Model
@@ -14,17 +15,16 @@ namespace TetraSticks.Model
             ReflectionMode = reflectionMode;
             _lazyWidth = new Lazy<int>(CalculateWidth);
             _lazyHeight = new Lazy<int>(CalculateHeight);
-            _lazyInteriorJunctionPoints = new Lazy<IEnumerable<Coords>>(CalculateInteriorJunctionPoints);
-            _lazyLines = new Lazy<IEnumerable<IEnumerable<Coords>>>(CalculateLines);
+            _lazyInteriorJunctionPoints = new Lazy<IImmutableList<Coords>>(CalculateInteriorJunctionPoints);
+            _lazyLines = new Lazy<IEnumerable<IImmutableList<Coords>>>(CalculateLines);
         }
 
-        public string Tag => TetraStick.Tag;
+        public TetraStick TetraStick { get; }
         public Coords Location { get; }
         public int Width => _lazyWidth.Value;
         public int Height => _lazyHeight.Value;
-        public IEnumerable<Coords> InteriorJunctionPoints => _lazyInteriorJunctionPoints.Value;
-        public IEnumerable<IEnumerable<Coords>> Lines => _lazyLines.Value;
-        private TetraStick TetraStick { get; }
+        public IImmutableList<Coords> InteriorJunctionPoints => _lazyInteriorJunctionPoints.Value;
+        public IEnumerable<IImmutableList<Coords>> Lines => _lazyLines.Value;
         private Orientation Orientation { get; }
         private ReflectionMode ReflectionMode { get; }
 
@@ -78,12 +78,12 @@ namespace TetraSticks.Model
 
         private readonly Lazy<int> _lazyWidth;
         private readonly Lazy<int> _lazyHeight;
-        private readonly Lazy<IEnumerable<Coords>> _lazyInteriorJunctionPoints;
-        private readonly Lazy<IEnumerable<IEnumerable<Coords>>> _lazyLines;
+        private readonly Lazy<IImmutableList<Coords>> _lazyInteriorJunctionPoints;
+        private readonly Lazy<IEnumerable<IImmutableList<Coords>>> _lazyLines;
 
         private int CalculateWidth()
         {
-            var coords = TetraStick.Lines.SelectMany(l => l).ToList();
+            var coords = TetraStick.Lines.SelectMany(line => line).ToImmutableList();
             var minX = coords.Min(c => c.X);
             var maxX = coords.Max(c => c.X);
             var minY = coords.Min(c => c.Y);
@@ -99,7 +99,7 @@ namespace TetraSticks.Model
 
         private int CalculateHeight()
         {
-            var coords = TetraStick.Lines.SelectMany(l => l).ToList();
+            var coords = TetraStick.Lines.SelectMany(line => line).ToImmutableList();
             var minX = coords.Min(c => c.X);
             var maxX = coords.Max(c => c.X);
             var minY = coords.Min(c => c.Y);
@@ -113,14 +113,15 @@ namespace TetraSticks.Model
             return maxX - minX;
         }
 
-        private IEnumerable<Coords> CalculateInteriorJunctionPoints()
+        private IImmutableList<Coords> CalculateInteriorJunctionPoints()
         {
-            return TetraStick.InteriorJunctionPoints.Select(ApplyTransform);
+            return TetraStick.InteriorJunctionPoints.Select(ApplyTransform).ToImmutableList();
         }
 
-        private IEnumerable<IEnumerable<Coords>> CalculateLines()
+        private IEnumerable<IImmutableList<Coords>> CalculateLines()
         {
-            return TetraStick.Lines.Select(line => line.Select(ApplyTransform));
+            return TetraStick.Lines
+                .Select(line => line.Select(ApplyTransform).ToImmutableList() as IImmutableList<Coords>);
         }
 
         public override string ToString()
