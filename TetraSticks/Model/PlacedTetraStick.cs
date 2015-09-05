@@ -4,13 +4,14 @@ using System.Linq;
 
 namespace TetraSticks.Model
 {
-    public class RotatedTetraStick
+    public class PlacedTetraStick
     {
-        public RotatedTetraStick(TetraStick tetraStick, Orientation orientation, bool reflected = false)
+        public PlacedTetraStick(TetraStick tetraStick, Coords location, Orientation orientation, ReflectionMode reflectionMode)
         {
+            Location = location;
             TetraStick = tetraStick;
             Orientation = orientation;
-            Reflected = reflected;
+            ReflectionMode = reflectionMode;
             _lazyWidth = new Lazy<int>(CalculateWidth);
             _lazyHeight = new Lazy<int>(CalculateHeight);
             _lazyInteriorJunctionPoints = new Lazy<IEnumerable<Coords>>(CalculateInteriorJunctionPoints);
@@ -21,26 +22,32 @@ namespace TetraSticks.Model
         public IEnumerable<Coords> InteriorJunctionPoints => _lazyInteriorJunctionPoints.Value;
         public IEnumerable<IEnumerable<Coords>> Lines => _lazyLines.Value;
         private TetraStick TetraStick { get; }
+        public Coords Location { get; }
         private Orientation Orientation { get; }
-        private bool Reflected { get; }
-        private int Width => _lazyWidth.Value;
-        private int Height => _lazyHeight.Value;
+        private ReflectionMode ReflectionMode { get; }
+        public int Width => _lazyWidth.Value;
+        public int Height => _lazyHeight.Value;
 
-        private Coords TransformCoords(Coords coords)
+        private Coords ApplyTransform(Coords coords)
+        {
+            return ApplyReflectionMode(ApplyOrientation(coords));
+        }
+
+        private Coords ApplyOrientation(Coords coords)
         {
             switch (Orientation)
             {
                 case Orientation.North:
-                    return ApplyReflectionMode(coords);
+                    return coords;
 
                 case Orientation.South:
-                    return ApplyReflectionMode(new Coords(Width - coords.X, Height - coords.Y));
+                    return new Coords(Width - coords.X, Height - coords.Y);
 
                 case Orientation.East:
-                    return ApplyReflectionMode(new Coords(coords.Y, Height - coords.X));
+                    return new Coords(coords.Y, Height - coords.X);
 
                 case Orientation.West:
-                    return ApplyReflectionMode(new Coords(Width - coords.Y, coords.X));
+                    return new Coords(Width - coords.Y, coords.X);
 
                 default:
                     throw new InvalidOperationException($"Unknown orientation, \"{Orientation}\".");
@@ -49,7 +56,17 @@ namespace TetraSticks.Model
 
         private Coords ApplyReflectionMode(Coords coords)
         {
-            return Reflected ? new Coords(Width - coords.X, coords.Y) : coords;
+            switch (ReflectionMode)
+            {
+                case ReflectionMode.Normal:
+                    return coords;
+
+                case ReflectionMode.MirrorY:
+                    return new Coords(Width - coords.X, coords.Y);
+
+                default:
+                    throw new InvalidOperationException($"Unknown reflection mode, \"{ReflectionMode}\".");
+            }
         }
 
         private readonly Lazy<int> _lazyWidth;
@@ -91,12 +108,17 @@ namespace TetraSticks.Model
 
         private IEnumerable<Coords> CalculateInteriorJunctionPoints()
         {
-            return TetraStick.InteriorJunctionPoints.Select(TransformCoords);
+            return TetraStick.InteriorJunctionPoints.Select(ApplyTransform);
         }
 
         private IEnumerable<IEnumerable<Coords>> CalculateLines()
         {
-            return TetraStick.Lines.Select(line => line.Select(TransformCoords));
+            return TetraStick.Lines.Select(line => line.Select(ApplyTransform));
+        }
+
+        public override string ToString()
+        {
+            return $"TetraStick: {TetraStick.Tag}; Location: {Location}; Orientation: {Orientation}; ReflectionMode: {ReflectionMode}";
         }
     }
 }

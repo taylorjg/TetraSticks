@@ -28,7 +28,7 @@ he discusses puzzles involving 15 of the 16 possible tetra sticks in a 5 x 5 squ
   - ~~draw with given orientation~~
   - ~~draw with given reflection mode~~
 - need to enumerate all possible locations for each tetra stick
-  - with all possible orientations
+  - with all possible orientations and reflection modes
 - need to be able to generate a matrix row for a given tetra stick/location/orientation
   - initially, ignore interior junction points
 - build DLX matrix with all rows (no secondary columns)

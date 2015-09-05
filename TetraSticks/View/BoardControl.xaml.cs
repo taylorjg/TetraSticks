@@ -22,11 +22,11 @@ namespace TetraSticks.View
             DrawGridLines();
         }
 
-        public void DrawRotatedTetraStick(RotatedTetraStick rotatedTetraStick, Coords location)
+        public void DrawPlacedTetraStick(PlacedTetraStick placedTetraStick)
         {
-            var colour = TetraStickColours.TagToColour(rotatedTetraStick.Tag);
-            foreach (var line in rotatedTetraStick.Lines)
-                DrawLine(colour, location, line.ToArray());
+            var colour = TetraStickColours.TagToColour(placedTetraStick.Tag);
+            foreach (var line in placedTetraStick.Lines)
+                DrawLine(colour, placedTetraStick.Location, line.ToArray());
         }
 
         private void DrawLine(Color colour, Coords location, params Coords[] coords)
