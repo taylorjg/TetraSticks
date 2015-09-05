@@ -15,68 +15,24 @@ namespace TetraSticks.Model
             return placedTetraSticks.Select(placedTetraStick => BuildDlxMatrixRow(tagToIndexDict, placedTetraStick));
         }
 
-        private static string BitsToString(IEnumerable<int> xs)
-        {
-            return string.Join("", xs.Select(x => Convert.ToString(x)));
-        }
-
-        private static void DumpLines(IEnumerable<IEnumerable<Coords>> lines)
-        {
-            foreach (var line in lines)
-                DumpLine(line);
-        }
-
-        private static void DumpLine(IEnumerable<Coords> line)
-        {
-            var pts = string.Join(", ", line.Select(pt => pt.ToString()));
-            Debug.WriteLine($"[{pts}]");
-        }
-
-        private static void DumpSegments(Tuple<IEnumerable<Tuple<Coords, Coords>>, IEnumerable<Tuple<Coords, Coords>>> t)
-        {
-            Debug.WriteLine("hs:");
-            DumpSegments(t.Item1);
-
-            Debug.WriteLine("vs:");
-            DumpSegments(t.Item2);
-        }
-
-        private static void DumpSegments(IEnumerable<Tuple<Coords, Coords>> segments)
-        {
-            var pts = string.Join(", ", segments.Select(pair => $"{pair.Item1} => {pair.Item2}"));
-            Debug.WriteLine($"[{pts}]");
-        }
-
         private static List<int> BuildDlxMatrixRow(Dictionary<string, int> tagToIndexDict, PlacedTetraStick placedTetraStick)
         {
-            // 15 columns for the 15 tetra sticks (map tag name to index, map is zip of tetraSticks with [0..])
-            // 25 columns for Hxy (0 <= x < 5, 0 <= y < 5) index is x*5+y
-            // 25 columns for Vxy (0 <= x < 5, 0 <= y < 5) index is x*5+y
-            // 16 columns for Ixy (0 < x < 5, 0 < y < 5)   index is (x-1)*4+(y-1)
-
             var arr1 = new int[15]; // the 15 tetra sticks
-            var arr2 = new int[25]; // Hxy where 0 <= x < 5, 0 <= y < 5
-            var arr3 = new int[25]; // Vxy where 0 <= x < 5, 0 <= y < 5
+            var arr2 = new int[30]; // Hxy where 0 <= x < 5, 0 <= y <= 5
+            var arr3 = new int[30]; // Vxy where 0 <= x <= 5, 0 <= y < 5
             // var arr4 = new int[16]; // Ixy where 0 < x < 5, 0 < y < 5
 
             arr1[tagToIndexDict[placedTetraStick.Tag]] = 1;
 
-            Debug.WriteLine("Before normalisation:");
-            DumpLines(placedTetraStick.Lines);
-
-            var t = NormaliseLines(placedTetraStick.Lines);
-
-            Debug.WriteLine("After normalisation:");
-            DumpSegments(t);
-
-            var hs = t.Item1;
-            var vs = t.Item2;
+            var tuple = NormaliseLines(placedTetraStick.Lines);
+            var hs = tuple.Item1;
+            var vs = tuple.Item2;
 
             foreach (var h in hs)
             {
                 var x = h.Item1.X;
                 var y = h.Item1.Y;
-                arr2[x*5 + y] = 1;
+                arr2[y*5 + x] = 1;
             }
 
             foreach (var v in vs)
@@ -94,8 +50,6 @@ namespace TetraSticks.Model
 
             // var arrs = new[] {arr1, arr2, arr3, arr4};
             var arrs = new[] {arr1, arr2, arr3};
-
-            Debug.WriteLine($"{BitsToString(arr1)} {BitsToString(arr2)} {BitsToString(arr3)}");
 
             return arrs.SelectMany(arr => arr).ToList();
         }

@@ -26,10 +26,10 @@ namespace TetraSticks.View
         {
             var colour = TetraStickColours.TagToColour(placedTetraStick.Tag);
             foreach (var line in placedTetraStick.Lines)
-                DrawLine(colour, placedTetraStick.Location, line.ToArray());
+                DrawLine(colour, line.ToArray());
         }
 
-        private void DrawLine(Color colour, Coords location, params Coords[] coords)
+        private void DrawLine(Color colour, params Coords[] coords)
         {
             var aw = ActualWidth;
             var ah = ActualHeight;
@@ -38,8 +38,8 @@ namespace TetraSticks.View
 
             var transformedPts = coords
                 .Select(coord => new Point(
-                    (location.X + coord.X) * sw + GridLineHalfThickness,
-                    (5 - location.Y - coord.Y) * sh + GridLineHalfThickness))
+                    (coord.X) * sw + GridLineHalfThickness,
+                    (5 - coord.Y) * sh + GridLineHalfThickness))
                 .ToList();
 
             var polyLineSegment = new PolyLineSegment(transformedPts, true);

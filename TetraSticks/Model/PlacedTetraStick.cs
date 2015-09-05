@@ -8,8 +8,8 @@ namespace TetraSticks.Model
     {
         public PlacedTetraStick(TetraStick tetraStick, Coords location, Orientation orientation, ReflectionMode reflectionMode)
         {
-            Location = location;
             TetraStick = tetraStick;
+            Location = location;
             Orientation = orientation;
             ReflectionMode = reflectionMode;
             _lazyWidth = new Lazy<int>(CalculateWidth);
@@ -19,18 +19,20 @@ namespace TetraSticks.Model
         }
 
         public string Tag => TetraStick.Tag;
+        public Coords Location { get; }
+        public int Width => _lazyWidth.Value;
+        public int Height => _lazyHeight.Value;
         public IEnumerable<Coords> InteriorJunctionPoints => _lazyInteriorJunctionPoints.Value;
         public IEnumerable<IEnumerable<Coords>> Lines => _lazyLines.Value;
         private TetraStick TetraStick { get; }
-        public Coords Location { get; }
         private Orientation Orientation { get; }
         private ReflectionMode ReflectionMode { get; }
-        public int Width => _lazyWidth.Value;
-        public int Height => _lazyHeight.Value;
 
         private Coords ApplyTransform(Coords coords)
         {
-            return ApplyReflectionMode(ApplyOrientation(coords));
+            return ApplyLocation(
+                ApplyReflectionMode(
+                    ApplyOrientation(coords)));
         }
 
         private Coords ApplyOrientation(Coords coords)
@@ -67,6 +69,11 @@ namespace TetraSticks.Model
                 default:
                     throw new InvalidOperationException($"Unknown reflection mode, \"{ReflectionMode}\".");
             }
+        }
+
+        private Coords ApplyLocation(Coords coords)
+        {
+            return new Coords(Location.X + coords.X, Location.Y + coords.Y);
         }
 
         private readonly Lazy<int> _lazyWidth;

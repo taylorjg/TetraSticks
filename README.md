@@ -27,19 +27,19 @@ he discusses puzzles involving 15 of the 16 possible tetra sticks in a 5 x 5 squ
   - ~~draw with correct colour~~
   - ~~draw with given orientation~~
   - ~~draw with given reflection mode~~
-- need to enumerate all possible locations for each tetra stick
-  - with all possible orientations and reflection modes
-- need to be able to generate a matrix row for a given tetra stick/location/orientation
-  - initially, ignore interior junction points
-- build DLX matrix with all rows (no secondary columns)
-  - we only want to do this for 15 of the 16 tetra sticks
-    - initially, hardcode which 15 tetra sticks to use
+- ~~need to enumerate all possible locations for each tetra stick~~
+  - ~~with all possible orientations and reflection modes~~
+- ~~need to be able to generate a matrix row for a given tetra stick/location/orientation~~
+  - ~~initially, ignore interior junction points~~
+- ~~build DLX matrix with all rows (no secondary columns)~~
+  - ~~we only want to do this for 15 of the 16 tetra sticks~~
+    - ~~initially, hardcode which 15 tetra sticks to use~~
 - solve DLX matrix
-  - initially on the main thread
-  - then on a background thread
-  - then display a dialog box during the action
-  - then add the ability to cancel the action
-- display (first) solution
+  - ~~initially on the main thread~~
+  - ~~display first solution~~
+  - then solve on a background thread
+  - then display a dialog box during solving
+  - then add the ability to cancel the solving
 - extend DlxLib to support secondary columns
 - extend DLX matrix by adding secondary columns for the interior
   junction points when these are not on the edges of the grid
