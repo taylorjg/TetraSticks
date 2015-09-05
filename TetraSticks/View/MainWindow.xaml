@@ -3,8 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:TetraSticks"
         xmlns:view="clr-namespace:TetraSticks.View"
+        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+        xmlns:command="http://www.galasoft.ch/mvvmlight"
         mc:Ignorable="d"
         Title="TetraSticks"
         ResizeMode="NoResize"
@@ -28,7 +29,27 @@
         </Grid>
 
         <DockPanel Margin="0,20,0,0" LastChildFill="True">
-            <Label Content="Tetra stick to omit:"  Visibility="Hidden" />
+            <Label Content="Tetra stick to omit:" />
+            <ComboBox Margin="5,0,0,0" VerticalAlignment="Center" Width="100" SelectedIndex="0">
+                <ComboBox.ItemsSource>
+                    <Binding Path="TetraSticksToOmit" Mode="OneWay" />
+                </ComboBox.ItemsSource>
+                <ComboBox.SelectedItem>
+                    <Binding Path="TetraStickToOmit" Mode="TwoWay" />
+                </ComboBox.SelectedItem>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="SelectionChanged">
+                        <command:EventToCommand Command="{Binding TetraStickToOmitChangedCommand}"
+                                      MustToggleIsEnabledValue="True" 
+                                      PassEventArgsToCommand="True" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <Label Content="{Binding Path=Tag}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
         </DockPanel>
 
     </StackPanel>

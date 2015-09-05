@@ -2,6 +2,7 @@
 using System.Linq;
 using DlxLib;
 using TetraSticks.Model;
+using TetraSticks.ViewModel;
 
 namespace TetraSticks.View
 {
@@ -10,6 +11,9 @@ namespace TetraSticks.View
         public MainWindow()
         {
             InitializeComponent();
+
+            DataContext = new MainWindowViewModel();
+
             ContentRendered += (_, __) =>
             {
                 BoardControl.DrawGrid();
