@@ -11,15 +11,13 @@ namespace TetraSticks.ViewModel
     public class MainWindowViewModel : ViewModelBase
     {
         private readonly IBoardControl _boardControl;
-        private readonly IDispatcher _dispatcher;
         private TetraStick _tetraStickToOmit;
         private RelayCommand _tetraStickToOmitChangedCommand;
         private RelayCommand _solveCommand;
 
-        public MainWindowViewModel(IBoardControl boardControl, IDispatcher dispatcher)
+        public MainWindowViewModel(IBoardControl boardControl)
         {
             _boardControl = boardControl;
-            _dispatcher = dispatcher;
             TetraStickToOmit = TetraSticksToOmit.First();
         }
 
@@ -59,8 +57,12 @@ namespace TetraSticks.ViewModel
             _boardControl.Clear();
             var puzzleSolver = new PuzzleSolver(
                 TetraStickToOmit,
-                _boardControl.DrawPlacedTetraSticks,
-                _dispatcher,
+                state =>
+                {
+                    var placedTetraSticks = (IEnumerable<PlacedTetraStick>)state;
+                    _boardControl.DrawPlacedTetraSticks(placedTetraSticks);
+                },
+                SynchronizationContext.Current,
                 CancellationToken.None);
             puzzleSolver.SolvePuzzle();
         }
