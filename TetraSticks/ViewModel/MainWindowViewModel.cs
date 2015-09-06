@@ -1,9 +1,12 @@
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Windows.Input;
+using DlxLib;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using TetraSticks.Model;
+using TetraSticks.View;
 
 namespace TetraSticks.ViewModel
 {
@@ -54,8 +57,13 @@ namespace TetraSticks.ViewModel
         private void OnSolve()
         {
             _boardControl.Clear();
-            //var puzzleSolver = new PuzzleSolver(_tetraStickToOmit);
-            //puzzleSolver.SolvePuzzle();
+            var tetraSticks = Model.TetraSticks.All.Where(ts => ts.Tag != TetraStickToOmit.Tag).ToImmutableList();
+            var rows = RowBuilder.BuildRows(tetraSticks);
+            var matrix = DlxMatrixBuilder.BuildDlxMatrix(tetraSticks, rows);
+            var dlx = new Dlx();
+            var firstSolution = dlx.Solve(matrix, d => d, r => r, 75).First();
+            var placedTetraSticks = firstSolution.RowIndexes.Select(idx => rows[idx]);
+            _boardControl.DrawPlacedTetraSticks(placedTetraSticks);
         }
     }
 }
