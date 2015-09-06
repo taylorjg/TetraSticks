@@ -93,6 +93,7 @@
     <Compile Include="Model\DlxMatrixBuilder.cs" />
     <Compile Include="Model\ReflectionMode.cs" />
     <Compile Include="Model\RowBuilder.cs" />
+    <Compile Include="ViewModel\IBoardControl.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
     <Compile Include="View\App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>

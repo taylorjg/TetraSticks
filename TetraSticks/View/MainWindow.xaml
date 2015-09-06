@@ -30,7 +30,7 @@
 
         <DockPanel Margin="0,20,0,0" LastChildFill="True">
             <Label Content="Tetra stick to omit:" />
-            <ComboBox Margin="5,0,0,0" VerticalAlignment="Center" Width="100" SelectedIndex="0">
+            <ComboBox Margin="5,0,0,0" VerticalAlignment="Center" SelectedIndex="0">
                 <ComboBox.ItemsSource>
                     <Binding Path="TetraSticksToOmit" Mode="OneWay" />
                 </ComboBox.ItemsSource>
@@ -50,6 +50,7 @@
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
+            <Button Content="Solve" Margin="20,0,0,0" VerticalAlignment="Center" Width="50" Command="{Binding Path=SolveCommand}" />
         </DockPanel>
 
     </StackPanel>

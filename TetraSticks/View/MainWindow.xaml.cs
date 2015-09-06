@@ -12,7 +12,7 @@ namespace TetraSticks.View
         {
             InitializeComponent();
 
-            DataContext = new MainWindowViewModel();
+            DataContext = new MainWindowViewModel(BoardControl);
 
             ContentRendered += (_, __) =>
             {
@@ -24,8 +24,8 @@ namespace TetraSticks.View
                 var matrix = DlxMatrixBuilder.BuildDlxMatrix(tetraSticks, rows);
                 var dlx = new Dlx();
                 var firstSolution = dlx.Solve(matrix, d => d, r => r, 75).First();
-                var solutionRows = firstSolution.RowIndexes.Select(idx => rows[idx]);
-                foreach (var row in solutionRows) BoardControl.DrawPlacedTetraStick(row);
+                var placedTetraSticks = firstSolution.RowIndexes.Select(idx => rows[idx]);
+                BoardControl.DrawPlacedTetraSticks(placedTetraSticks);
             };
         }
     }

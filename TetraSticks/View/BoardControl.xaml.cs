@@ -5,14 +5,21 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using TetraSticks.Model;
+using TetraSticks.ViewModel;
 
 namespace TetraSticks.View
 {
-    public partial class BoardControl
+    public partial class BoardControl : IBoardControl
     {
         private readonly Color _gridColour = Color.FromArgb(0x80, 0xCD, 0x85, 0x3F);
         private const int GridLineThickness = 4;
         private const int GridLineHalfThickness = GridLineThickness / 2;
+
+        private enum TagType
+        {
+            GridLine,
+            TetraStick
+        }
 
         public BoardControl()
         {
@@ -24,7 +31,18 @@ namespace TetraSticks.View
             DrawGridLines();
         }
 
-        public void DrawPlacedTetraStick(PlacedTetraStick placedTetraStick)
+        public void Clear()
+        {
+            RemoveChildrenWithTagType(TagType.TetraStick);
+        }
+
+        public void DrawPlacedTetraSticks(IEnumerable<PlacedTetraStick> placedTetraSticks)
+        {
+            foreach (var placedTetraStick in placedTetraSticks)
+                DrawPlacedTetraStick(placedTetraStick);
+        }
+
+        private void DrawPlacedTetraStick(PlacedTetraStick placedTetraStick)
         {
             var colour = TetraStickColours.TetraStickToColour(placedTetraStick.TetraStick);
             foreach (var line in placedTetraStick.Lines)
@@ -56,7 +74,8 @@ namespace TetraSticks.View
                 StrokeStartLineCap = PenLineCap.Round,
                 StrokeEndLineCap = PenLineCap.Round,
                 StrokeLineJoin = PenLineJoin.Round,
-                Data = pathGeometry
+                Data = pathGeometry,
+                Tag = TagType.TetraStick
             };
             BoardCanvas.Children.Add(path);
         }
@@ -80,7 +99,8 @@ namespace TetraSticks.View
                     X1 = 0,
                     Y1 = row * sh + GridLineHalfThickness,
                     X2 = aw,
-                    Y2 = row * sh + GridLineHalfThickness
+                    Y2 = row * sh + GridLineHalfThickness,
+                    Tag = TagType.GridLine
                 };
                 BoardCanvas.Children.Add(line);
             }
@@ -95,9 +115,31 @@ namespace TetraSticks.View
                     X1 = col * sw + GridLineHalfThickness,
                     Y1 = 0,
                     X2 = col * sw + GridLineHalfThickness,
-                    Y2 = ah
+                    Y2 = ah,
+                    Tag = TagType.GridLine
                 };
                 BoardCanvas.Children.Add(line);
+            }
+        }
+
+        private void RemoveChildrenWithTagType(TagType tagType)
+        {
+            var elementsToRemove = new List<UIElement>();
+
+            // ReSharper disable LoopCanBeConvertedToQuery
+            foreach (var element in BoardCanvas.Children)
+            {
+                var frameworkElement = element as FrameworkElement;
+                if (frameworkElement?.Tag as TagType? == tagType)
+                {
+                    elementsToRemove.Add(frameworkElement);
+                }
+            }
+            // ReSharper restore LoopCanBeConvertedToQuery
+
+            foreach (var element in elementsToRemove)
+            {
+                BoardCanvas.Children.Remove(element);
             }
         }
     }
