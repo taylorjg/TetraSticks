@@ -57,11 +57,7 @@ namespace TetraSticks.ViewModel
             _boardControl.Clear();
             var puzzleSolver = new PuzzleSolver(
                 TetraStickToOmit,
-                state =>
-                {
-                    var placedTetraSticks = (IEnumerable<PlacedTetraStick>)state;
-                    _boardControl.DrawPlacedTetraSticks(placedTetraSticks);
-                },
+                _boardControl.DrawPlacedTetraSticks,
                 SynchronizationContext.Current,
                 CancellationToken.None);
             puzzleSolver.SolvePuzzle();

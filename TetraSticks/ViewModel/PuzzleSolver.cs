@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
@@ -10,19 +11,19 @@ namespace TetraSticks.ViewModel
 {
     public class PuzzleSolver
     {
-        private readonly Action<object> _solutionFoundHandler;
+        private readonly Action<IEnumerable<PlacedTetraStick>> _onSolutionFound;
         private readonly TetraStick _tetraStickToOmit;
         private readonly SynchronizationContext _synchronizationContext;
         private readonly CancellationToken _cancellationToken;
 
         public PuzzleSolver(
             TetraStick tetraStickToOmit,
-            Action<object> solutionFoundHandler,
+            Action<IEnumerable<PlacedTetraStick>> onSolutionFound,
             SynchronizationContext synchronizationContext,
             CancellationToken cancellationToken)
         {
             _tetraStickToOmit = tetraStickToOmit;
-            _solutionFoundHandler = solutionFoundHandler;
+            _onSolutionFound = onSolutionFound;
             _synchronizationContext = synchronizationContext;
             _cancellationToken = cancellationToken;
         }
@@ -44,7 +45,7 @@ namespace TetraSticks.ViewModel
             var dlx = new Dlx();
             var firstSolution = dlx.Solve(matrix, d => d, r => r, 75).First();
             var placedTetraSticks = firstSolution.RowIndexes.Select(idx => rows[idx]);
-            _synchronizationContext.Post(new SendOrPostCallback(_solutionFoundHandler), placedTetraSticks);
+            _synchronizationContext.Post(_onSolutionFound, placedTetraSticks);
         }
     }
 }
