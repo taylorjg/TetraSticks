@@ -8,11 +8,13 @@ namespace TetraSticks.View
         {
             InitializeComponent();
 
-            DataContext = new MainWindowViewModel(BoardControl);
+            DataContext = new MainWindowViewModel(
+                BoardControl,
+                new WpfDispatcher(Dispatcher));
 
             ContentRendered += (_, __) =>
             {
-                (BoardControl as IBoardControl).DrawGrid();
+                BoardControl.DrawGrid();
             };
         }
     }

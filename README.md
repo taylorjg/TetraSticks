@@ -31,27 +31,26 @@ he discusses puzzles involving 15 of the 16 possible tetra sticks in a 5 x 5 squ
   - ~~with all possible orientations and reflection modes~~
 - ~~need to be able to generate a matrix row for a given tetra stick/location/orientation~~
   - ~~initially, ignore interior junction points~~
-- ~~build DLX matrix with all rows (no secondary columns)~~
+- ~~build the DLX matrix with all rows (but no secondary columns)~~
   - ~~we only want to do this for 15 of the 16 tetra sticks~~
     - ~~initially, hardcode which 15 tetra sticks to use~~
-- solve DLX matrix
+- solve the DLX matrix
   - ~~initially on the main thread~~
   - ~~display first solution~~
-  - then solve on a background thread
+  - ~~then solve on a background thread~~
   - then display a dialog box during solving
   - then add the ability to cancel the solving
 - ~~extend DlxLib to support secondary columns~~
 - ~~extend DLX matrix by adding secondary columns for the interior
   junction points when these are not on the edges of the grid~~
-- add the ability to control which of the 16 tetra sticks should be omitted
-  - simple dropdown showing the name of the tetra stick e.g. "L"
-  - enhance this further by adding a tiny picture (with the correct colour)
-    of the tetra stick next to the name
+- add the ability to select which of the tetra sticks (H, J, L, N, Y) to omit
+  - ~~simple dropdown showing the name of the tetra stick e.g. "L"~~
+  - enhance this by adding a tiny picture of the tetra stick next to the name (drawn North with the correct colour)
+- add the ability to step forward through each solution
+- improve the drawing of the tetra sticks on the board (currently it is very basic and looks a bit naff)
+- add the ability to display each step of the algorithm ?
 - display stats in status bar (size of matrix and elapsed time to solve it)
-- add ability to step through all the solutions
-- add ability to display a partial solution
-- add ability to control speed at which partial solutions are displayed
-- MVVM!
+- Use the MVVM pattern (to at least some extent)
 
 ## Links
 

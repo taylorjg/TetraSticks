@@ -94,7 +94,9 @@
     <Compile Include="Model\ReflectionMode.cs" />
     <Compile Include="Model\RowBuilder.cs" />
     <Compile Include="ViewModel\IBoardControl.cs" />
+    <Compile Include="ViewModel\IDispatcher.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
+    <Compile Include="ViewModel\PuzzleSolver.cs" />
     <Compile Include="View\App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
@@ -109,6 +111,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="View\TetraStickColours.cs" />
+    <Compile Include="View\WpfDispatcher.cs" />
     <Page Include="View\BoardControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

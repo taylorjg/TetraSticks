@@ -1,25 +1,25 @@
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
+using System.Threading;
 using System.Windows.Input;
-using DlxLib;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using TetraSticks.Model;
-using TetraSticks.View;
 
 namespace TetraSticks.ViewModel
 {
     public class MainWindowViewModel : ViewModelBase
     {
         private readonly IBoardControl _boardControl;
+        private readonly IDispatcher _dispatcher;
         private TetraStick _tetraStickToOmit;
         private RelayCommand _tetraStickToOmitChangedCommand;
         private RelayCommand _solveCommand;
 
-        public MainWindowViewModel(IBoardControl boardControl)
+        public MainWindowViewModel(IBoardControl boardControl, IDispatcher dispatcher)
         {
             _boardControl = boardControl;
+            _dispatcher = dispatcher;
             TetraStickToOmit = TetraSticksToOmit.First();
         }
 
@@ -57,13 +57,12 @@ namespace TetraSticks.ViewModel
         private void OnSolve()
         {
             _boardControl.Clear();
-            var tetraSticks = Model.TetraSticks.All.Where(ts => ts.Tag != TetraStickToOmit.Tag).ToImmutableList();
-            var rows = RowBuilder.BuildRows(tetraSticks);
-            var matrix = DlxMatrixBuilder.BuildDlxMatrix(tetraSticks, rows);
-            var dlx = new Dlx();
-            var firstSolution = dlx.Solve(matrix, d => d, r => r, 75).First();
-            var placedTetraSticks = firstSolution.RowIndexes.Select(idx => rows[idx]);
-            _boardControl.DrawPlacedTetraSticks(placedTetraSticks);
+            var puzzleSolver = new PuzzleSolver(
+                TetraStickToOmit,
+                _boardControl.DrawPlacedTetraSticks,
+                _dispatcher,
+                CancellationToken.None);
+            puzzleSolver.SolvePuzzle();
         }
     }
 }
