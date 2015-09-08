@@ -21,11 +21,11 @@ namespace TetraSticks.Model
 
         public TetraStick TetraStick { get; }
         public Coords Location { get; }
+        public Orientation Orientation { get; }
         public int Width => _lazyWidth.Value;
         public int Height => _lazyHeight.Value;
         public IImmutableList<Coords> InteriorJunctionPoints => _lazyInteriorJunctionPoints.Value;
         public IEnumerable<IImmutableList<Coords>> Lines => _lazyLines.Value;
-        private Orientation Orientation { get; }
         private ReflectionMode ReflectionMode { get; }
 
         private Coords ApplyTransform(Coords coords)

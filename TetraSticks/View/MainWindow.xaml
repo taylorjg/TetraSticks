@@ -28,8 +28,8 @@
             <view:BoardControl x:Name="BoardControl" Width="544" Height="544" />
         </Grid>
 
-        <DockPanel Margin="0,20,0,0" LastChildFill="True">
-            <Label Content="Tetra stick to omit:" />
+        <DockPanel Margin="0,20,0,0" LastChildFill="False">
+            <Label Content="Tetra stick to omit:" VerticalAlignment="Center" />
             <ComboBox Margin="5,0,0,0" VerticalAlignment="Center" SelectedIndex="0">
                 <ComboBox.ItemsSource>
                     <Binding Path="TetraSticksToOmit" Mode="OneWay" />
@@ -37,20 +37,16 @@
                 <ComboBox.SelectedItem>
                     <Binding Path="TetraStickToOmit" Mode="TwoWay" />
                 </ComboBox.SelectedItem>
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="SelectionChanged">
-                        <command:EventToCommand Command="{Binding TetraStickToOmitChangedCommand}"
-                                      MustToggleIsEnabledValue="True" 
-                                      PassEventArgsToCommand="True" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
                         <Label Content="{Binding Path=Tag}" />
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
-            <Button Content="Solve" Margin="20,0,0,0" VerticalAlignment="Center" Width="50" Command="{Binding Path=SolveCommand}" />
+            <Button Content="Solve" Margin="20,0,0,0" VerticalAlignment="Center" MinWidth="50" Command="{Binding Path=SolveCommand}" />
+            <Button Content="Next Solution" Margin="20,0,0,0" VerticalAlignment="Center" MinWidth="50" Command="{Binding Path=ShowNextSolutionCommand}" />
+            <Label Content="{Binding Path=FormattedStats}" VerticalAlignment="Center" />
+            <Button Content="Cancel" Margin="20,0,0,0" VerticalAlignment="Center" MinWidth="50" Command="{Binding Path=CancelCommand}" />
         </DockPanel>
 
     </StackPanel>

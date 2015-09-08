@@ -34,22 +34,33 @@ he discusses puzzles involving 15 of the 16 possible tetra sticks in a 5 x 5 squ
 - ~~build the DLX matrix with all rows (but no secondary columns)~~
   - ~~we only want to do this for 15 of the 16 tetra sticks~~
     - ~~initially, hardcode which 15 tetra sticks to use~~
-- solve the DLX matrix
+- ~~solve the DLX matrix~~
   - ~~initially on the main thread~~
   - ~~display first solution~~
   - ~~then solve on a background thread~~
-  - then display a dialog box during solving
-  - then add the ability to cancel the solving
+  - ~~then add the ability to cancel the solving~~
 - ~~extend DlxLib to support secondary columns~~
 - ~~extend DLX matrix by adding secondary columns for the interior
   junction points when these are not on the edges of the grid~~
 - add the ability to select which of the tetra sticks (H, J, L, N, Y) to omit
   - ~~simple dropdown showing the name of the tetra stick e.g. "L"~~
   - enhance this by adding a tiny picture of the tetra stick next to the name (drawn North with the correct colour)
-- add the ability to step forward through each solution
+- ~~add the ability to step forward through each solution~~
+  - ~~add Next Solution and Cancel buttons~~
+  - ~~enable/disable the buttons appropriately~~
+  - ~~the background thread should invoke onSolutionFound for each solution~~
+  - ~~view model needs a CurrentSolutionIndex property (initially null)~~
+  - ~~onSolutionFound impl will just add each solution to a list in the view model~~
+    - ~~if this is the first solution then automatically display it~~
+  - ~~OnNextSolution displays the next available solution~~
+    - ~~only enabled when there is another solution to display~~
+  - ~~add a label to indicate we are currently displaying solution 'n' of 'total'
+  where 'total' auto-updates as the background thread finds more solutions~~
 - improve the drawing of the tetra sticks on the board (currently it is very basic and looks a bit naff)
 - add the ability to display each step of the algorithm ?
-- display stats in status bar (size of matrix and elapsed time to solve it)
+- add a status bar
+- display messages in the status bar
+- display stats in the status bar (size of matrix and elapsed time to solve it)
 - Use the MVVM pattern (to at least some extent)
 
 ## Links

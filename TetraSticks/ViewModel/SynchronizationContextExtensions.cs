@@ -5,6 +5,11 @@ namespace TetraSticks.ViewModel
 {
     public static class SynchronizationContextExtensions
     {
+        public static void Post(this SynchronizationContext synchronizationContext, Action action)
+        {
+            synchronizationContext.Post(_ => action(), null);
+        }
+
         public static void Post<T1>(this SynchronizationContext synchronizationContext, Action<T1> action, T1 state1)
         {
             synchronizationContext.Post(

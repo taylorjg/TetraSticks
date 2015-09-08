@@ -7,12 +7,13 @@ namespace TetraSticks.Model
 {
     public static class RowBuilder
     {
-        public static IImmutableList<PlacedTetraStick> BuildRows(IEnumerable<TetraStick> tetraSticks)
+        public static IImmutableList<PlacedTetraStick> BuildRows(IImmutableList<TetraStick> tetraSticks)
         {
-            var locations =
-                (from x in Enumerable.Range(0, 5)
-                    from y in Enumerable.Range(0, 5)
-                    select new Coords(x, y)).ToImmutableList();
+            var locations = (
+                from x in Enumerable.Range(0, 5)
+                from y in Enumerable.Range(0, 5)
+                select new Coords(x, y)
+                ).ToImmutableList();
             var orientations = Enum.GetValues(typeof (Orientation)).Cast<Orientation>().ToImmutableList();
             var reflectionModes = Enum.GetValues(typeof (ReflectionMode)).Cast<ReflectionMode>().ToImmutableList();
 
@@ -25,12 +26,28 @@ namespace TetraSticks.Model
                 where IsFullyWithinGrid(placedTetraStick)
                 select placedTetraStick;
 
-            return placedTetraSticks.Distinct(new PlacedTetraStickComparer()).ToImmutableList();
+            placedTetraSticks = placedTetraSticks.Distinct(new PlacedTetraStickComparer());
+            placedTetraSticks = PinFirstTetraStickToBeNorthOriented(tetraSticks, placedTetraSticks);
+
+            return placedTetraSticks.ToImmutableList();
+        }
+
+        private static IEnumerable<PlacedTetraStick> PinFirstTetraStickToBeNorthOriented(
+            IEnumerable<TetraStick> tetraSticks,
+            IEnumerable<PlacedTetraStick> placedTetraSticks)
+        {
+            var firstTag = tetraSticks.First().Tag;
+
+            Func<PlacedTetraStick, bool> isNotFirst = pts => pts.TetraStick.Tag != firstTag;
+            Func<PlacedTetraStick, bool> isOrientedNorth = pts => pts.Orientation == Orientation.North;
+
+            return placedTetraSticks.Where(pts => isNotFirst(pts) || isOrientedNorth(pts));
         }
 
         private static bool IsFullyWithinGrid(PlacedTetraStick placedTetraStick)
         {
             var location = placedTetraStick.Location;
+
             return location.X >= 0 && location.X < 5 &&
                    location.Y >= 0 && location.Y < 5 &&
                    location.X + placedTetraStick.Width <= 5 &&
