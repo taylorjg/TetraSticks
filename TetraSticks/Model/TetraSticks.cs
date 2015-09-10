@@ -203,9 +203,6 @@ namespace TetraSticks.Model
             ImmutableList.Create(
                 new Coords(1, 0)),
             ImmutableList.Create(
-                new Coords(1, 0)
-                ),
-            ImmutableList.Create(
                 new Coords(0, 0),
                 new Coords(1, 0),
                 new Coords(2, 0),

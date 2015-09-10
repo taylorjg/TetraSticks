@@ -13,6 +13,7 @@ namespace TetraSticks.View
             ContentRendered += (_, __) =>
             {
                 BoardControl.DrawGrid();
+                BoardControl.CombinedGeometryExperiment();
             };
         }
     }

@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
@@ -14,11 +16,32 @@ namespace TetraSticks.View
         private readonly Color _gridColour = Color.FromArgb(0x80, 0xCD, 0x85, 0x3F);
         private const int GridLineThickness = 4;
         private const int GridLineHalfThickness = GridLineThickness / 2;
+        private const int GridLineDoubleThickness = GridLineThickness * 2;
+        private const int TetraStickThickness = 8;
+        private const int TetraStickHalfThickness = TetraStickThickness / 2;
+        private const int TetraStickInset = TetraStickThickness * 2;
+        private double _sw;
+        private double _sh;
 
         private enum TagType
         {
             GridLine,
             TetraStick
+        }
+
+        private enum Direction
+        {
+            Left,
+            Right,
+            Up,
+            Down
+        };
+
+        private enum Disposition
+        {
+            First,
+            Middle,
+            Last
         }
 
         public BoardControl()
@@ -56,11 +79,13 @@ namespace TetraSticks.View
             var sw = (aw - GridLineThickness) / 5;
             var sh = (ah - GridLineThickness) / 5;
 
-            var transformedPts = coords
+            IImmutableList<Point> transformedPts = coords
                 .Select(coord => new Point(
                     (coord.X)*sw + GridLineHalfThickness,
                     (5 - coord.Y)*sh + GridLineHalfThickness))
                 .ToImmutableList();
+
+            transformedPts = PullLineEndsIn(transformedPts);
 
             var polyLineSegment = new PolyLineSegment(transformedPts, true);
             var pathFigure = new PathFigure { StartPoint = transformedPts.First() };
@@ -70,7 +95,7 @@ namespace TetraSticks.View
             var path = new Path
             {
                 Stroke = new SolidColorBrush(colour),
-                StrokeThickness = GridLineThickness * 2,
+                StrokeThickness = GridLineDoubleThickness,
                 StrokeStartLineCap = PenLineCap.Round,
                 StrokeEndLineCap = PenLineCap.Round,
                 StrokeLineJoin = PenLineJoin.Round,
@@ -80,12 +105,262 @@ namespace TetraSticks.View
             BoardCanvas.Children.Add(path);
         }
 
+        private void DrawPlacedTetraStick2(PlacedTetraStick placedTetraStick)
+        {
+            var colour = TetraStickColours.TetraStickToColour(placedTetraStick.TetraStick);
+            var path = new Path
+            {
+                Data = CombineGeometries(placedTetraStick.Lines.Select(LineToPathGeometry).ToImmutableList()),
+                StrokeThickness = 1,
+                Stroke = new SolidColorBrush(Colors.Black),
+                Fill = new SolidColorBrush(colour)
+            };
+            BoardCanvas.Children.Add(path);
+        }
+
+        private PathGeometry LineToPathGeometry(IImmutableList<Coords> line)
+        {
+            var lineSegments = LineToLineSegments(line);
+            var combinedLineSegments = CombineConsecutiveLineSegments(lineSegments);
+            var segments = BuildPathSegmentCollection(combinedLineSegments);
+            SortPathSegmentCollection(segments);
+            return new PathGeometry
+            {
+                Figures = new PathFigureCollection
+                {
+                    new PathFigure
+                    {
+                        StartPoint = new Point(0, 0),
+                        Segments = segments
+                    }
+                }
+            };
+        }
+
+        IImmutableList<Tuple<Coords, Coords, Direction, Disposition>> LineToLineSegments(IImmutableList<Coords> coords)
+        {
+            return null;
+        }
+
+        IImmutableList<Tuple<Coords, Coords, Direction, Disposition>> CombineConsecutiveLineSegments(IImmutableList<Tuple<Coords, Coords, Direction, Disposition>> lineSegments)
+        {
+            return lineSegments;
+        }
+
+        PathSegmentCollection BuildPathSegmentCollection(IImmutableList<Tuple<Coords, Coords, Direction, Disposition>> lineSegments)
+        {
+            return null;
+        }
+
+        void SortPathSegmentCollection(PathSegmentCollection segments)
+        {
+        }
+
+        CombinedGeometry CombineGeometries(IReadOnlyList<Geometry> geometries)
+        {
+            Debug.Assert(geometries.Count >= 2);
+            var seed = new CombinedGeometry(GeometryCombineMode.Union, geometries[0], geometries[1]);
+            return geometries.Skip(2).Aggregate(seed, (cg, g) => new CombinedGeometry(GeometryCombineMode.Union, cg, g));
+        }
+
+        private void AddEndCapLeft(PathSegmentCollection segments, Coords coords)
+        {
+        }
+
+        private void AddEndCapRight(PathSegmentCollection segments, Coords coords)
+        {
+        }
+
+        private void AddEndCapTop(PathSegmentCollection segments, Coords coords)
+        {
+        }
+
+        private void AddEndCapBottom(PathSegmentCollection segments, Coords coords)
+        {
+        }
+
+        private void AddLineHorizontal(PathSegmentCollection segments, Coords coords1, Coords coords2)
+        {
+        }
+
+        private void AddLineVertical(PathSegmentCollection segments, Coords coords1, Coords coords2)
+        {
+        }
+
+        private void AddCornerRightThenUp(PathSegmentCollection segments, Coords coords)
+        {
+        }
+
+        private void AddCornerRightThenDown(PathSegmentCollection segments, Coords coords)
+        {
+        }
+
+        private void AddCornerLeftThenUp(PathSegmentCollection segments, Coords coords)
+        {
+        }
+
+        private void AddCornerLeftThenDown(PathSegmentCollection segments, Coords coords)
+        {
+        }
+
+        private void AddCornerUpThenLeft(PathSegmentCollection segments, Coords coords)
+        {
+        }
+
+        private void AddCornerUpThenRight(PathSegmentCollection segments, Coords coords)
+        {
+        }
+
+        private void AddCornerDownThenLeft(PathSegmentCollection segments, Coords coords)
+        {
+        }
+
+        private void AddCornerDownThenRight(PathSegmentCollection segments, Coords coords)
+        {
+        }
+
+        private Point CoordsToInsetUpperLeftHorizontal(Coords coords)
+        {
+            return new Point(
+                coords.X * _sw + GridLineHalfThickness + TetraStickInset,
+                (5 - coords.Y) * _sh + GridLineHalfThickness - TetraStickHalfThickness);
+        }
+
+        private Point CoordsToInsetLowerLeftHorizontal(Coords coords)
+        {
+            return new Point(
+                coords.X * _sw + GridLineHalfThickness + TetraStickInset,
+                (5 - coords.Y) * _sh + GridLineHalfThickness + TetraStickHalfThickness);
+        }
+
+        private Point CoordsToInsetUpperRightHorizontal(Coords coords)
+        {
+            return new Point(
+                coords.X * _sw + GridLineHalfThickness - TetraStickInset,
+                (5 - coords.Y) * _sh + GridLineHalfThickness - TetraStickHalfThickness);
+        }
+
+        private Point CoordsToInsetLowerRightHorizontal(Coords coords)
+        {
+            return new Point(
+                coords.X * _sw + GridLineHalfThickness - TetraStickInset,
+                (5 - coords.Y) * _sh + GridLineHalfThickness + TetraStickHalfThickness);
+        }
+
+        public void CombinedGeometryExperiment()
+        {
+            var coords1 = new Coords(2, 2);
+            var coords2 = new Coords(3, 2);
+
+            var g1 = new PathGeometry();
+            var pf1 = new PathFigure
+            {
+                StartPoint = CoordsToInsetUpperLeftHorizontal(coords1)
+            };
+            pf1.Segments.Add(new ArcSegment
+            {
+                Point = CoordsToInsetLowerLeftHorizontal(coords1),
+                Size = new Size(TetraStickHalfThickness, TetraStickHalfThickness)
+            });
+            pf1.Segments.Add(new LineSegment
+            {
+                Point = CoordsToInsetLowerRightHorizontal(coords2)
+            });
+            pf1.Segments.Add(new ArcSegment
+            {
+                Point = CoordsToInsetUpperRightHorizontal(coords2),
+                Size = new Size(TetraStickHalfThickness, TetraStickHalfThickness)
+            });
+            pf1.Segments.Add(new LineSegment
+            {
+                Point = CoordsToInsetUpperLeftHorizontal(coords1)
+            });
+            g1.Figures.Add(pf1);
+
+            var coords3 = new Coords(0, 4);
+            var coords4 = new Coords(3, 4);
+
+            var g2 = new PathGeometry();
+            var pf2 = new PathFigure
+            {
+                StartPoint = CoordsToInsetUpperLeftHorizontal(coords3)
+            };
+            pf2.Segments.Add(new ArcSegment
+            {
+                Point = CoordsToInsetLowerLeftHorizontal(coords3),
+                Size = new Size(TetraStickHalfThickness, TetraStickHalfThickness)
+            });
+            pf2.Segments.Add(new LineSegment
+            {
+                Point = CoordsToInsetLowerRightHorizontal(coords4)
+            });
+            pf2.Segments.Add(new ArcSegment
+            {
+                Point = CoordsToInsetUpperRightHorizontal(coords4),
+                Size = new Size(TetraStickHalfThickness, TetraStickHalfThickness)
+            });
+            pf2.Segments.Add(new LineSegment
+            {
+                Point = CoordsToInsetUpperLeftHorizontal(coords3)
+            });
+            g2.Figures.Add(pf2);
+
+            var path = new Path
+            {
+                Data = CombineGeometries(ImmutableList.Create(g1, g2)),
+                StrokeThickness = 1,
+                Stroke = new SolidColorBrush(Colors.Black),
+                Fill = new SolidColorBrush(TetraStickColours.TetraStickToColour(Model.TetraSticks.V))
+            };
+
+            BoardCanvas.Children.Add(path);
+        }
+
+        private static IImmutableList<Point> PullLineEndsIn(IImmutableList<Point> transformedPts)
+        {
+            return PullEndIn(PullStartIn(transformedPts));
+        }
+
+        private static IImmutableList<Point> PullStartIn(IImmutableList<Point> transformedPts)
+        {
+            var newStart = PullPointIn(transformedPts[0], transformedPts[1]);
+            var rest = transformedPts.Skip(1);
+            return ImmutableList.CreateRange(new[] {newStart}.Concat(rest));
+        }
+
+        private static IImmutableList<Point> PullEndIn(IImmutableList<Point> transformedPts)
+        {
+            var count = transformedPts.Count;
+            var newEnd = PullPointIn(transformedPts[count - 1], transformedPts[count - 2]);
+            var rest = transformedPts.Take(transformedPts.Count - 1);
+            return ImmutableList.CreateRange(rest.Concat(new[] {newEnd}));
+        }
+
+        private static Point PullPointIn(Point pt1, Point pt2)
+        {
+            // Horizontal
+            if (Math.Abs(pt1.Y - pt2.Y) < 0.001)
+            {
+                return pt1.X > pt2.X ? new Point(pt1.X - GridLineDoubleThickness, pt1.Y) : new Point(pt1.X + GridLineDoubleThickness, pt1.Y);
+            }
+
+            // Vertical
+            if (Math.Abs(pt1.X - pt2.X) < 0.001)
+            {
+                return pt1.Y > pt2.Y ? new Point(pt1.X, pt1.Y - GridLineDoubleThickness) : new Point(pt1.X, pt1.Y + GridLineDoubleThickness);
+            }
+
+            throw new InvalidOperationException("...");
+        }
+
         private void DrawGridLines()
         {
             var aw = ActualWidth;
             var ah = ActualHeight;
             var sw = (aw - GridLineThickness) / 5;
             var sh = (ah - GridLineThickness) / 5;
+            _sw = sw;
+            _sh = sh;
 
             var gridLineBrush = new SolidColorBrush(_gridColour);
 
