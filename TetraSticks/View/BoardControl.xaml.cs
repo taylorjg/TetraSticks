@@ -123,40 +123,119 @@ namespace TetraSticks.View
             var lineSegments = LineToLineSegments(line);
             var combinedLineSegments = CombineConsecutiveLineSegments(lineSegments);
             var segments = BuildPathSegmentCollection(combinedLineSegments);
-            SortPathSegmentCollection(segments);
+            var sortedSegments = SortPathSegmentCollection(segments);
             return new PathGeometry
             {
                 Figures = new PathFigureCollection
                 {
                     new PathFigure
                     {
-                        StartPoint = new Point(0, 0),
-                        Segments = segments
+                        StartPoint = new Point(0, 0), // TODO: use proper value here...
+                        Segments = sortedSegments
                     }
                 }
             };
         }
 
-        IImmutableList<Tuple<Coords, Coords, Direction, Disposition>> LineToLineSegments(IImmutableList<Coords> coords)
+        private static IImmutableList<Tuple<Coords, Coords, Direction, Disposition>> LineToLineSegments(IImmutableList<Coords> coords)
+        {
+            Func<Coords, Coords, Direction> f1 = (c1, c2) =>
+            {
+                if (c1.Y == c2.Y && c1.X > c2.X) return Direction.Left;
+                if (c1.Y == c2.Y && c1.X < c2.X) return Direction.Right;
+                if (c1.X == c2.X && c1.Y < c2.Y) return Direction.Up;
+                if (c1.X == c2.X && c1.Y > c2.Y) return Direction.Down;
+                throw new InvalidOperationException("...");
+            };
+
+            Func<int, Disposition> f2 = i =>
+            {
+                if (i == 1) return Disposition.First;
+                if (i == coords.Count - 1) return Disposition.Last;
+                return Disposition.Middle;
+            };
+
+            var result = new List<Tuple<Coords, Coords, Direction, Disposition>>();
+
+            for (var i = 1; i < coords.Count; i++)
+            {
+                var coords1 = coords[i - 1];
+                var coords2 = coords[i];
+                var direction = f1(coords1, coords2);
+                var disposition = f2(i);
+                result.Add(Tuple.Create(coords1, coords2, direction, disposition));
+            }
+
+            return result.ToImmutableList();
+        }
+
+        private static IImmutableList<Tuple<Coords, Coords, Direction, Disposition>> CombineConsecutiveLineSegments(IImmutableList<Tuple<Coords, Coords, Direction, Disposition>> lineSegments)
+        {
+            var result = new List<Tuple<Coords, Coords, Direction, Disposition>>();
+
+            var currentLineSegments = new List<Tuple<Coords, Coords, Direction, Disposition>> {lineSegments[0]};
+            for (var i = 1; i < lineSegments.Count; i++)
+            {
+                var nextLineSegment = lineSegments[i];
+                if (nextLineSegment.Item3 == currentLineSegments[0].Item3)
+                {
+                    currentLineSegments.Add(nextLineSegment);
+                }
+                else
+                {
+                    var combinedLineSegment = Tuple.Create(
+                        currentLineSegments.First().Item1,
+                        currentLineSegments.Last().Item2,
+                        currentLineSegments.First().Item3,
+                        Disposition.Middle);
+                    result.Add(combinedLineSegment);
+                    currentLineSegments = new List<Tuple<Coords, Coords, Direction, Disposition>> {nextLineSegment};
+                }
+            }
+
+            if (currentLineSegments.Any())
+            {
+                var combinedLineSegment = Tuple.Create(
+                    currentLineSegments.First().Item1,
+                    currentLineSegments.Last().Item2,
+                    currentLineSegments.First().Item3,
+                    Disposition.Middle);
+                result.Add(combinedLineSegment);
+            }
+
+            result[0] = Tuple.Create(result.First().Item1, result.First().Item2, result.First().Item3, Disposition.First);
+            result[result.Count - 1] = Tuple.Create(result.Last().Item1, result.Last().Item2, result.Last().Item3, Disposition.Last);
+
+            // What about case of I where there will be only 1 combined segment ?
+            // Disposition.First and Disposition.Last ???
+            // I guess we could make Disposition a bit flags enum ?
+            // Or add a new enum value FirstAndLast ?
+            // Or could we get away with simply Middle/End ?
+
+            return result.ToImmutableList();
+        }
+
+        private PathSegmentCollection BuildPathSegmentCollection(IImmutableList<Tuple<Coords, Coords, Direction, Disposition>> lineSegments)
         {
             return null;
         }
 
-        IImmutableList<Tuple<Coords, Coords, Direction, Disposition>> CombineConsecutiveLineSegments(IImmutableList<Tuple<Coords, Coords, Direction, Disposition>> lineSegments)
+        private static PathSegmentCollection SortPathSegmentCollection(PathSegmentCollection segments)
         {
-            return lineSegments;
+            var sortedSegments = new List<PathSegment> {segments.First()};
+            var n = segments.Count - 2;
+            Debug.Assert(n%2 == 0);
+            var m = n/2;
+            var v1 = Enumerable.Range(0, m).ToList();
+            var v2 = v1.Select(x => x * 2 + 1);
+            var v3 = v1.Select(x => x * 2 + 2);
+            sortedSegments.AddRange(v2.Select(x => segments[x]));
+            sortedSegments.Add(segments.Last());
+            sortedSegments.AddRange(v3.Select(x => segments[x]).Reverse());
+            return new PathSegmentCollection(sortedSegments);
         }
 
-        PathSegmentCollection BuildPathSegmentCollection(IImmutableList<Tuple<Coords, Coords, Direction, Disposition>> lineSegments)
-        {
-            return null;
-        }
-
-        void SortPathSegmentCollection(PathSegmentCollection segments)
-        {
-        }
-
-        CombinedGeometry CombineGeometries(IReadOnlyList<Geometry> geometries)
+        private static CombinedGeometry CombineGeometries(IReadOnlyList<Geometry> geometries)
         {
             Debug.Assert(geometries.Count >= 2);
             var seed = new CombinedGeometry(GeometryCombineMode.Union, geometries[0], geometries[1]);
@@ -165,10 +244,20 @@ namespace TetraSticks.View
 
         private void AddEndCapLeft(PathSegmentCollection segments, Coords coords)
         {
+            segments.Add(new ArcSegment
+            {
+                Point = CoordsToInsetLowerLeftHorizontal(coords),
+                Size = new Size(TetraStickHalfThickness, TetraStickHalfThickness)
+            });
         }
 
         private void AddEndCapRight(PathSegmentCollection segments, Coords coords)
         {
+            segments.Add(new ArcSegment
+            {
+                Point = CoordsToInsetUpperRightHorizontal(coords),
+                Size = new Size(TetraStickHalfThickness, TetraStickHalfThickness)
+            });
         }
 
         private void AddEndCapTop(PathSegmentCollection segments, Coords coords)
@@ -181,6 +270,15 @@ namespace TetraSticks.View
 
         private void AddLineHorizontal(PathSegmentCollection segments, Coords coords1, Coords coords2)
         {
+            segments.Add(new LineSegment
+            {
+                Point = CoordsToInsetLowerRightHorizontal(coords2)
+            });
+
+            segments.Add(new LineSegment
+            {
+                Point = CoordsToInsetUpperLeftHorizontal(coords1)
+            });
         }
 
         private void AddLineVertical(PathSegmentCollection segments, Coords coords1, Coords coords2)
@@ -257,24 +355,19 @@ namespace TetraSticks.View
             {
                 StartPoint = CoordsToInsetUpperLeftHorizontal(coords1)
             };
-            pf1.Segments.Add(new ArcSegment
-            {
-                Point = CoordsToInsetLowerLeftHorizontal(coords1),
-                Size = new Size(TetraStickHalfThickness, TetraStickHalfThickness)
-            });
-            pf1.Segments.Add(new LineSegment
-            {
-                Point = CoordsToInsetLowerRightHorizontal(coords2)
-            });
-            pf1.Segments.Add(new ArcSegment
-            {
-                Point = CoordsToInsetUpperRightHorizontal(coords2),
-                Size = new Size(TetraStickHalfThickness, TetraStickHalfThickness)
-            });
-            pf1.Segments.Add(new LineSegment
-            {
-                Point = CoordsToInsetUpperLeftHorizontal(coords1)
-            });
+            AddEndCapLeft(pf1.Segments, coords1);
+            AddLineHorizontal(pf1.Segments, coords1, coords2);
+            //pf1.Segments.Add(new LineSegment
+            //{
+            //    Point = CoordsToInsetLowerRightHorizontal(coords2)
+            //});
+            AddEndCapRight(pf1.Segments, coords2);
+            //pf1.Segments.Add(new LineSegment
+            //{
+            //    Point = CoordsToInsetUpperLeftHorizontal(coords1)
+            //});
+            var sortedPf1Segments = SortPathSegmentCollection(pf1.Segments);
+            pf1.Segments = sortedPf1Segments;
             g1.Figures.Add(pf1);
 
             var coords3 = new Coords(0, 4);
@@ -285,20 +378,12 @@ namespace TetraSticks.View
             {
                 StartPoint = CoordsToInsetUpperLeftHorizontal(coords3)
             };
-            pf2.Segments.Add(new ArcSegment
-            {
-                Point = CoordsToInsetLowerLeftHorizontal(coords3),
-                Size = new Size(TetraStickHalfThickness, TetraStickHalfThickness)
-            });
+            AddEndCapLeft(pf2.Segments, coords3);
             pf2.Segments.Add(new LineSegment
             {
                 Point = CoordsToInsetLowerRightHorizontal(coords4)
             });
-            pf2.Segments.Add(new ArcSegment
-            {
-                Point = CoordsToInsetUpperRightHorizontal(coords4),
-                Size = new Size(TetraStickHalfThickness, TetraStickHalfThickness)
-            });
+            AddEndCapRight(pf2.Segments, coords4);
             pf2.Segments.Add(new LineSegment
             {
                 Point = CoordsToInsetUpperLeftHorizontal(coords3)
