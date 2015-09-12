@@ -140,10 +140,10 @@ namespace TetraSticks.View
                     return CoordsToInsetLowerRightHorizontal(first.Item1);
                 case Direction.Right:
                     return CoordsToInsetUpperLeftHorizontal(first.Item1);
-                //case Direction.Up:
-                //    return CoordsToInsetLowerLeftVertical(first.Item1);
-                //case Direction.Down:
-                //    return CoordsToInsetUpperRightVertical(first.Item1);
+                case Direction.Up:
+                    return CoordsToInsetLowerLeftVertical(first.Item1);
+                case Direction.Down:
+                    return CoordsToInsetUpperRightVertical(first.Item1);
                 default:
                     throw new InvalidOperationException("...");
             }
@@ -348,10 +348,20 @@ namespace TetraSticks.View
 
         private void AddEndCapTop(PathSegmentCollection segments, Coords coords)
         {
+            segments.Add(new ArcSegment
+            {
+                Point = CoordsToInsetUpperLeftVertical(coords),
+                Size = new Size(TetraStickHalfThickness, TetraStickHalfThickness)
+            });
         }
 
         private void AddEndCapBottom(PathSegmentCollection segments, Coords coords)
         {
+            segments.Add(new ArcSegment
+            {
+                Point = CoordsToInsetLowerRightVertical(coords),
+                Size = new Size(TetraStickHalfThickness, TetraStickHalfThickness)
+            });
         }
 
         private void AddLineHorizontal(PathSegmentCollection segments, Coords coords1, Coords coords2)
@@ -369,6 +379,15 @@ namespace TetraSticks.View
 
         private void AddLineVertical(PathSegmentCollection segments, Coords coords1, Coords coords2)
         {
+            segments.Add(new LineSegment
+            {
+                Point = CoordsToInsetUpperRightVertical(coords2)
+            });
+
+            segments.Add(new LineSegment
+            {
+                Point = CoordsToInsetLowerLeftVertical(coords1)
+            });
         }
 
         private void AddCornerRightThenUp(PathSegmentCollection segments, Coords coords)
@@ -431,17 +450,45 @@ namespace TetraSticks.View
                 (5 - coords.Y) * _sh + GridLineHalfThickness + TetraStickHalfThickness);
         }
 
+        private Point CoordsToInsetUpperLeftVertical(Coords coords)
+        {
+            return new Point(
+                coords.X * _sw + GridLineHalfThickness - TetraStickHalfThickness,
+                (5 - coords.Y) * _sh + GridLineHalfThickness + TetraStickInset);
+        }
+
+        private Point CoordsToInsetUpperRightVertical(Coords coords)
+        {
+            return new Point(
+                coords.X * _sw + GridLineHalfThickness + TetraStickHalfThickness,
+                (5 - coords.Y) * _sh + GridLineHalfThickness + TetraStickInset);
+        }
+
+        private Point CoordsToInsetLowerLeftVertical(Coords coords)
+        {
+            return new Point(
+                coords.X * _sw + GridLineHalfThickness - TetraStickHalfThickness,
+                (5 - coords.Y) * _sh + GridLineHalfThickness - TetraStickInset);
+        }
+
+        private Point CoordsToInsetLowerRightVertical(Coords coords)
+        {
+            return new Point(
+                coords.X * _sw + GridLineHalfThickness + TetraStickHalfThickness,
+                (5 - coords.Y) * _sh + GridLineHalfThickness - TetraStickInset);
+        }
+
         public void CombinedGeometryExperiment()
         {
             var line1 = ImmutableList.Create(
                 new Coords(2, 2),
-                new Coords(3, 2));
+                new Coords(2, 4));
 
             var line2 = ImmutableList.Create(
-                new Coords(0, 4),
-                new Coords(1, 4),
-                new Coords(2, 4),
-                new Coords(3, 4));
+                new Coords(0, 3),
+                new Coords(1, 3),
+                new Coords(2, 3),
+                new Coords(3, 3));
 
             var tempTetraStick = new TetraStick("V", ImmutableList<Coords>.Empty, line1, line2);
             var tempPlacedTetraStick = new PlacedTetraStick(tempTetraStick, new Coords(0, 0), Orientation.North, ReflectionMode.Normal);
