@@ -16,7 +16,6 @@ namespace TetraSticks.View
         private readonly Color _gridColour = Color.FromArgb(0x80, 0xCD, 0x85, 0x3F);
         private const int GridLineThickness = 4;
         private const int GridLineHalfThickness = GridLineThickness / 2;
-        private const int GridLineDoubleThickness = GridLineThickness * 2;
         private const int TetraStickThickness = 8;
         private const int TetraStickHalfThickness = TetraStickThickness / 2;
         private const int TetraStickInset = TetraStickThickness * 2;
@@ -56,46 +55,6 @@ namespace TetraSticks.View
         {
             foreach (var placedTetraStick in placedTetraSticks)
                 DrawPlacedTetraStick(placedTetraStick);
-        }
-
-        //private void DrawPlacedTetraStick(PlacedTetraStick placedTetraStick)
-        //{
-        //    var colour = TetraStickColours.TetraStickToColour(placedTetraStick.TetraStick);
-        //    foreach (var line in placedTetraStick.Lines)
-        //        DrawLine(colour, line);
-        //}
-
-        private void DrawLine(Color colour, IEnumerable<Coords> coords)
-        {
-            var aw = ActualWidth;
-            var ah = ActualHeight;
-            var sw = (aw - GridLineThickness) / 5;
-            var sh = (ah - GridLineThickness) / 5;
-
-            IImmutableList<Point> transformedPts = coords
-                .Select(coord => new Point(
-                    (coord.X)*sw + GridLineHalfThickness,
-                    (5 - coord.Y)*sh + GridLineHalfThickness))
-                .ToImmutableList();
-
-            transformedPts = PullLineEndsIn(transformedPts);
-
-            var polyLineSegment = new PolyLineSegment(transformedPts, true);
-            var pathFigure = new PathFigure { StartPoint = transformedPts.First() };
-            pathFigure.Segments.Add(polyLineSegment);
-            var pathGeometry = new PathGeometry();
-            pathGeometry.Figures.Add(pathFigure);
-            var path = new Path
-            {
-                Stroke = new SolidColorBrush(colour),
-                StrokeThickness = GridLineDoubleThickness,
-                StrokeStartLineCap = PenLineCap.Round,
-                StrokeEndLineCap = PenLineCap.Round,
-                StrokeLineJoin = PenLineJoin.Round,
-                Data = pathGeometry,
-                Tag = TagType.TetraStick
-            };
-            BoardCanvas.Children.Add(path);
         }
 
         private void DrawPlacedTetraStick(PlacedTetraStick placedTetraStick)
@@ -605,72 +564,6 @@ namespace TetraSticks.View
             return new Point(
                 coords.X * _sw + GridLineHalfThickness + TetraStickHalfThickness,
                 (5 - coords.Y) * _sh + GridLineHalfThickness - TetraStickInset);
-        }
-
-        public void CombinedGeometryExperiment()
-        {
-            //var line1 = ImmutableList.Create(
-            //    new Coords(1, 1),
-            //    new Coords(1, 0),
-            //    new Coords(0, 0));
-
-            //var line2 = ImmutableList.Create(
-            //    new Coords(0, 1),
-            //    new Coords(1, 1),
-            //    new Coords(2, 1),
-            //    new Coords(3, 1));
-
-            //var tetraStick = new TetraStick("V", ImmutableList<Coords>.Empty, line1);
-            //var tetraStick = new TetraStick("V", ImmutableList<Coords>.Empty, line1, line2);
-
-            //var tetraStick = Model.TetraSticks.X;
-            //var location = new Coords(1, 1);
-            //var orientation = Orientation.North;
-            //var reflectionMode = ReflectionMode.Normal;
-
-            //var tempPlacedTetraStick = new PlacedTetraStick(
-            //    tetraStick,
-            //    location,
-            //    orientation,
-            //    reflectionMode);
-            //DrawPlacedTetraStick2(tempPlacedTetraStick);
-        }
-
-        private static IImmutableList<Point> PullLineEndsIn(IImmutableList<Point> transformedPts)
-        {
-            return PullEndIn(PullStartIn(transformedPts));
-        }
-
-        private static IImmutableList<Point> PullStartIn(IImmutableList<Point> transformedPts)
-        {
-            var newStart = PullPointIn(transformedPts[0], transformedPts[1]);
-            var rest = transformedPts.Skip(1);
-            return ImmutableList.CreateRange(new[] {newStart}.Concat(rest));
-        }
-
-        private static IImmutableList<Point> PullEndIn(IImmutableList<Point> transformedPts)
-        {
-            var count = transformedPts.Count;
-            var newEnd = PullPointIn(transformedPts[count - 1], transformedPts[count - 2]);
-            var rest = transformedPts.Take(transformedPts.Count - 1);
-            return ImmutableList.CreateRange(rest.Concat(new[] {newEnd}));
-        }
-
-        private static Point PullPointIn(Point pt1, Point pt2)
-        {
-            // Horizontal
-            if (Math.Abs(pt1.Y - pt2.Y) < 0.001)
-            {
-                return pt1.X > pt2.X ? new Point(pt1.X - GridLineDoubleThickness, pt1.Y) : new Point(pt1.X + GridLineDoubleThickness, pt1.Y);
-            }
-
-            // Vertical
-            if (Math.Abs(pt1.X - pt2.X) < 0.001)
-            {
-                return pt1.Y > pt2.Y ? new Point(pt1.X, pt1.Y - GridLineDoubleThickness) : new Point(pt1.X, pt1.Y + GridLineDoubleThickness);
-            }
-
-            throw new InvalidOperationException("...");
         }
 
         private void DrawGridLines()
