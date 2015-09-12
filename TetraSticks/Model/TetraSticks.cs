@@ -196,6 +196,16 @@ namespace TetraSticks.Model
                 new Coords(1, 0),
                 new Coords(1, 1),
                 new Coords(2, 1)
+                ),
+            ImmutableList.Create(
+                new Coords(0, 1),
+                new Coords(1, 1),
+                new Coords(1, 0)
+                ),
+            ImmutableList.Create(
+                new Coords(1, 2),
+                new Coords(1, 1),
+                new Coords(2, 1)
                 ));
 
         public static TetraStick Y => new TetraStick(
