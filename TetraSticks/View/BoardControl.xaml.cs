@@ -281,16 +281,16 @@ namespace TetraSticks.View
             switch (lineSegment.Item3)
             {
                 case Direction.Left:
-                    AddLineHorizontal(segments, lineSegment.Item2, lineSegment.Item1);
+                    AddLineLeftHorizontal(segments, lineSegment.Item1, lineSegment.Item2);
                     break;
                 case Direction.Right:
-                    AddLineHorizontal(segments, lineSegment.Item1, lineSegment.Item2);
+                    AddLineRightHorizontal(segments, lineSegment.Item1, lineSegment.Item2);
                     break;
                 case Direction.Up:
-                    AddLineVertical(segments, lineSegment.Item1, lineSegment.Item2);
+                    AddLineUpVertical(segments, lineSegment.Item1, lineSegment.Item2);
                     break;
                 case Direction.Down:
-                    AddLineVertical(segments, lineSegment.Item2, lineSegment.Item1);
+                    AddLineDownVertical(segments, lineSegment.Item1, lineSegment.Item2);
                     break;
                 default:
                     throw new InvalidOperationException("...");
@@ -299,6 +299,8 @@ namespace TetraSticks.View
 
         private void AddAppropriateCorner(PathSegmentCollection segments, Tuple<Coords, Coords, Direction> lineSegment, bool isLast)
         {
+            if (isLast) return;
+            AddCornerRightThenUp(segments, lineSegment.Item2);
         }
 
         private static PathSegmentCollection SortPathSegmentCollection(PathSegmentCollection segments)
@@ -364,7 +366,7 @@ namespace TetraSticks.View
             });
         }
 
-        private void AddLineHorizontal(PathSegmentCollection segments, Coords coords1, Coords coords2)
+        private void AddLineRightHorizontal(PathSegmentCollection segments, Coords coords1, Coords coords2)
         {
             segments.Add(new LineSegment
             {
@@ -377,7 +379,20 @@ namespace TetraSticks.View
             });
         }
 
-        private void AddLineVertical(PathSegmentCollection segments, Coords coords1, Coords coords2)
+        private void AddLineLeftHorizontal(PathSegmentCollection segments, Coords coords1, Coords coords2)
+        {
+            segments.Add(new LineSegment
+            {
+                Point = CoordsToInsetUpperLeftHorizontal(coords2)
+            });
+
+            segments.Add(new LineSegment
+            {
+                Point = CoordsToInsetLowerRightHorizontal(coords1)
+            });
+        }
+
+        private void AddLineUpVertical(PathSegmentCollection segments, Coords coords1, Coords coords2)
         {
             segments.Add(new LineSegment
             {
@@ -390,37 +405,59 @@ namespace TetraSticks.View
             });
         }
 
+        private void AddLineDownVertical(PathSegmentCollection segments, Coords coords1, Coords coords2)
+        {
+            segments.Add(new LineSegment
+            {
+                Point = CoordsToInsetLowerLeftVertical(coords2)
+            });
+
+            segments.Add(new LineSegment
+            {
+                Point = CoordsToInsetUpperRightVertical(coords1)
+            });
+        }
+
         private void AddCornerRightThenUp(PathSegmentCollection segments, Coords coords)
         {
+            segments.Add(new LineSegment
+            {
+                Point = CoordsToInsetLowerRightVertical(coords)
+            });
+
+            segments.Add(new LineSegment
+            {
+                Point = CoordsToInsetUpperRightHorizontal(coords)
+            });
         }
 
-        private void AddCornerRightThenDown(PathSegmentCollection segments, Coords coords)
-        {
-        }
+        //private void AddCornerRightThenDown(PathSegmentCollection segments, Coords coords)
+        //{
+        //}
 
-        private void AddCornerLeftThenUp(PathSegmentCollection segments, Coords coords)
-        {
-        }
+        //private void AddCornerLeftThenUp(PathSegmentCollection segments, Coords coords)
+        //{
+        //}
 
-        private void AddCornerLeftThenDown(PathSegmentCollection segments, Coords coords)
-        {
-        }
+        //private void AddCornerLeftThenDown(PathSegmentCollection segments, Coords coords)
+        //{
+        //}
 
-        private void AddCornerUpThenLeft(PathSegmentCollection segments, Coords coords)
-        {
-        }
+        //private void AddCornerUpThenLeft(PathSegmentCollection segments, Coords coords)
+        //{
+        //}
 
-        private void AddCornerUpThenRight(PathSegmentCollection segments, Coords coords)
-        {
-        }
+        //private void AddCornerUpThenRight(PathSegmentCollection segments, Coords coords)
+        //{
+        //}
 
-        private void AddCornerDownThenLeft(PathSegmentCollection segments, Coords coords)
-        {
-        }
+        //private void AddCornerDownThenLeft(PathSegmentCollection segments, Coords coords)
+        //{
+        //}
 
-        private void AddCornerDownThenRight(PathSegmentCollection segments, Coords coords)
-        {
-        }
+        //private void AddCornerDownThenRight(PathSegmentCollection segments, Coords coords)
+        //{
+        //}
 
         private Point CoordsToInsetUpperLeftHorizontal(Coords coords)
         {
@@ -481,17 +518,29 @@ namespace TetraSticks.View
         public void CombinedGeometryExperiment()
         {
             var line1 = ImmutableList.Create(
-                new Coords(2, 2),
-                new Coords(2, 4));
+                new Coords(0, 0),
+                new Coords(1, 0),
+                new Coords(1, 1));
 
-            var line2 = ImmutableList.Create(
-                new Coords(0, 3),
-                new Coords(1, 3),
-                new Coords(2, 3),
-                new Coords(3, 3));
+            //var line2 = ImmutableList.Create(
+            //    new Coords(0, 1),
+            //    new Coords(1, 1),
+            //    new Coords(2, 1),
+            //    new Coords(3, 1));
 
-            var tempTetraStick = new TetraStick("V", ImmutableList<Coords>.Empty, line1, line2);
-            var tempPlacedTetraStick = new PlacedTetraStick(tempTetraStick, new Coords(0, 0), Orientation.North, ReflectionMode.Normal);
+            var tetraStick = new TetraStick("V", ImmutableList<Coords>.Empty, line1);
+            //var tetraStick = new TetraStick("V", ImmutableList<Coords>.Empty, line1, line2);
+
+            //var tetraStick = Model.TetraSticks.X;
+            var location = new Coords(1, 1);
+            var orientation = Orientation.North;
+            var reflectionMode = ReflectionMode.Normal;
+
+            var tempPlacedTetraStick = new PlacedTetraStick(
+                tetraStick,
+                location,
+                orientation,
+                reflectionMode);
             DrawPlacedTetraStick2(tempPlacedTetraStick);
         }
 
