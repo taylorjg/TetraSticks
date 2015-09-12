@@ -19,6 +19,8 @@ namespace TetraSticks.View
         private const int TetraStickThickness = 8;
         private const int TetraStickHalfThickness = TetraStickThickness / 2;
         private const int TetraStickInset = TetraStickThickness * 2;
+        private const int TetraStickSmallCornerRadius = TetraStickInset - TetraStickHalfThickness;
+        private const int TetraStickLargeCornerRadius = TetraStickInset + TetraStickHalfThickness;
         private double _sw;
         private double _sh;
 
@@ -75,8 +77,12 @@ namespace TetraSticks.View
         {
             var lineSegments = LineToLineSegments(line);
             var combinedLineSegments = CombineConsecutiveLineSegments(lineSegments);
-            var segments = BuildPathSegmentCollection(combinedLineSegments);
-            var sortedSegments = SortPathSegmentCollection(segments);
+
+            var pathSegmentCollection =
+                HandleClosedPaths(
+                    line,
+                    SortPathSegmentCollection(
+                        BuildPathSegmentCollection(combinedLineSegments)));
 
             return new PathGeometry
             {
@@ -85,7 +91,7 @@ namespace TetraSticks.View
                     new PathFigure
                     {
                         StartPoint = GetStartingPoint(combinedLineSegments),
-                        Segments = sortedSegments
+                        Segments = pathSegmentCollection
                     }
                 }
             };
@@ -192,6 +198,31 @@ namespace TetraSticks.View
             return segments;
         }
 
+        private PathSegmentCollection HandleClosedPaths(IImmutableList<Coords> line, PathSegmentCollection segments)
+        {
+            if (!Equals(line.First(), line.Last())) return segments;
+            return segments;
+        }
+
+        private static PathSegmentCollection SortPathSegmentCollection(PathSegmentCollection segments)
+        {
+            var n = segments.Count - 2;
+            Debug.Assert(n % 2 == 0);
+            var m = n / 2;
+
+            // TODO: use better variables for v1, v2 and v3
+            var v1 = Enumerable.Range(0, m).ToList();
+            var v2 = v1.Select(x => x * 2 + 1);
+            var v3 = v1.Select(x => x * 2 + 2);
+
+            var sortedSegments = new List<PathSegment> { segments.First() };
+            sortedSegments.AddRange(v2.Select(x => segments[x]));
+            sortedSegments.Add(segments.Last());
+            sortedSegments.AddRange(v3.Select(x => segments[x]).Reverse());
+
+            return new PathSegmentCollection(sortedSegments);
+        }
+
         private void AddAppropriateStartEndCap(PathSegmentCollection segments, Tuple<Coords, Coords, Direction> lineSegment, bool isFirst)
         {
             if (!isFirst) return;
@@ -289,25 +320,6 @@ namespace TetraSticks.View
                 default:
                     throw new InvalidOperationException("...");
             }
-        }
-
-        private static PathSegmentCollection SortPathSegmentCollection(PathSegmentCollection segments)
-        {
-            var n = segments.Count - 2;
-            Debug.Assert(n % 2 == 0);
-            var m = n / 2;
-
-            // TODO: use better variables for v1, v2 and v3
-            var v1 = Enumerable.Range(0, m).ToList();
-            var v2 = v1.Select(x => x * 2 + 1);
-            var v3 = v1.Select(x => x * 2 + 2);
-
-            var sortedSegments = new List<PathSegment> { segments.First() };
-            sortedSegments.AddRange(v2.Select(x => segments[x]));
-            sortedSegments.Add(segments.Last());
-            sortedSegments.AddRange(v3.Select(x => segments[x]).Reverse());
-
-            return new PathSegmentCollection(sortedSegments);
         }
 
         private static Geometry CombineGeometries(IReadOnlyList<Geometry> geometries)
@@ -408,105 +420,129 @@ namespace TetraSticks.View
 
         private void AddCornerLeftThenUp(PathSegmentCollection segments, Coords coords)
         {
-            segments.Add(new LineSegment
+            segments.Add(new ArcSegment
             {
-                Point = CoordsToInsetLowerRightVertical(coords)
+                Point = CoordsToInsetLowerRightVertical(coords),
+                Size = new Size(TetraStickSmallCornerRadius, TetraStickSmallCornerRadius),
+                SweepDirection = SweepDirection.Clockwise
             });
 
-            segments.Add(new LineSegment
+            segments.Add(new ArcSegment
             {
-                Point = CoordsToInsetLowerLeftHorizontal(coords)
+                Point = CoordsToInsetLowerLeftHorizontal(coords),
+                Size = new Size(TetraStickLargeCornerRadius, TetraStickLargeCornerRadius)
             });
         }
 
         private void AddCornerLeftThenDown(PathSegmentCollection segments, Coords coords)
         {
-            segments.Add(new LineSegment
+            segments.Add(new ArcSegment
             {
-                Point = CoordsToInsetUpperLeftVertical(coords)
+                Point = CoordsToInsetUpperLeftVertical(coords),
+                Size = new Size(TetraStickLargeCornerRadius, TetraStickLargeCornerRadius)
             });
 
-            segments.Add(new LineSegment
+            segments.Add(new ArcSegment
             {
-                Point = CoordsToInsetLowerLeftHorizontal(coords)
+                Point = CoordsToInsetLowerLeftHorizontal(coords),
+                Size = new Size(TetraStickSmallCornerRadius, TetraStickSmallCornerRadius),
+                SweepDirection = SweepDirection.Clockwise
             });
         }
 
         private void AddCornerRightThenUp(PathSegmentCollection segments, Coords coords)
         {
-            segments.Add(new LineSegment
+            segments.Add(new ArcSegment
             {
-                Point = CoordsToInsetLowerRightVertical(coords)
+                Point = CoordsToInsetLowerRightVertical(coords),
+                Size = new Size(TetraStickLargeCornerRadius, TetraStickLargeCornerRadius)
             });
 
-            segments.Add(new LineSegment
+            segments.Add(new ArcSegment
             {
-                Point = CoordsToInsetUpperRightHorizontal(coords)
+                Point = CoordsToInsetUpperRightHorizontal(coords),
+                Size = new Size(TetraStickSmallCornerRadius, TetraStickSmallCornerRadius),
+                SweepDirection = SweepDirection.Clockwise
             });
         }
 
         private void AddCornerRightThenDown(PathSegmentCollection segments, Coords coords)
         {
-            segments.Add(new LineSegment
+            segments.Add(new ArcSegment
             {
-                Point = CoordsToInsetUpperLeftVertical(coords)
+                Point = CoordsToInsetUpperLeftVertical(coords),
+                Size = new Size(TetraStickSmallCornerRadius, TetraStickSmallCornerRadius),
+                SweepDirection = SweepDirection.Clockwise
             });
 
-            segments.Add(new LineSegment
+            segments.Add(new ArcSegment
             {
-                Point = CoordsToInsetUpperRightHorizontal(coords)
+                Point = CoordsToInsetUpperRightHorizontal(coords),
+                Size = new Size(TetraStickLargeCornerRadius, TetraStickLargeCornerRadius)
             });
         }
 
         private void AddCornerUpThenLeft(PathSegmentCollection segments, Coords coords)
         {
-            segments.Add(new LineSegment
+            segments.Add(new ArcSegment
             {
-                Point = CoordsToInsetUpperRightHorizontal(coords)
+                Point = CoordsToInsetUpperRightHorizontal(coords),
+                Size = new Size(TetraStickLargeCornerRadius, TetraStickLargeCornerRadius)
             });
 
-            segments.Add(new LineSegment
+            segments.Add(new ArcSegment
             {
-                Point = CoordsToInsetUpperLeftVertical(coords)
+                Point = CoordsToInsetUpperLeftVertical(coords),
+                Size = new Size(TetraStickSmallCornerRadius, TetraStickSmallCornerRadius),
+                SweepDirection = SweepDirection.Clockwise
             });
         }
 
         private void AddCornerUpThenRight(PathSegmentCollection segments, Coords coords)
         {
-            segments.Add(new LineSegment
+            segments.Add(new ArcSegment
             {
-                Point = CoordsToInsetLowerLeftHorizontal(coords)
+                Point = CoordsToInsetLowerLeftHorizontal(coords),
+                Size = new Size(TetraStickSmallCornerRadius, TetraStickSmallCornerRadius),
+                SweepDirection = SweepDirection.Clockwise
             });
 
-            segments.Add(new LineSegment
+            segments.Add(new ArcSegment
             {
-                Point = CoordsToInsetUpperLeftVertical(coords)
+                Point = CoordsToInsetUpperLeftVertical(coords),
+                Size = new Size(TetraStickLargeCornerRadius, TetraStickLargeCornerRadius)
             });
         }
 
         private void AddCornerDownThenLeft(PathSegmentCollection segments, Coords coords)
         {
-            segments.Add(new LineSegment
+            segments.Add(new ArcSegment
             {
-                Point = CoordsToInsetUpperRightHorizontal(coords)
+                Point = CoordsToInsetUpperRightHorizontal(coords),
+                Size = new Size(TetraStickSmallCornerRadius, TetraStickSmallCornerRadius),
+                SweepDirection = SweepDirection.Clockwise
             });
 
-            segments.Add(new LineSegment
+            segments.Add(new ArcSegment
             {
-                Point = CoordsToInsetLowerRightVertical(coords)
+                Point = CoordsToInsetLowerRightVertical(coords),
+                Size = new Size(TetraStickLargeCornerRadius, TetraStickLargeCornerRadius)
             });
         }
 
         private void AddCornerDownThenRight(PathSegmentCollection segments, Coords coords)
         {
-            segments.Add(new LineSegment
+            segments.Add(new ArcSegment
             {
-                Point = CoordsToInsetLowerLeftHorizontal(coords)
+                Point = CoordsToInsetLowerLeftHorizontal(coords),
+                Size = new Size(TetraStickLargeCornerRadius, TetraStickLargeCornerRadius)
             });
 
-            segments.Add(new LineSegment
+            segments.Add(new ArcSegment
             {
-                Point = CoordsToInsetLowerRightVertical(coords)
+                Point = CoordsToInsetLowerRightVertical(coords),
+                Size = new Size(TetraStickSmallCornerRadius, TetraStickSmallCornerRadius),
+                SweepDirection = SweepDirection.Clockwise
             });
         }
 
