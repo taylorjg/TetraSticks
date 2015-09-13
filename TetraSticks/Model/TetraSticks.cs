@@ -96,11 +96,18 @@ namespace TetraSticks.Model
         public static TetraStick O => new TetraStick(
             "O",
             ImmutableList<Coords>.Empty,
+            //ImmutableList.Create(
+            //    new Coords(0, 0),
+            //    new Coords(0, 1),
+            //    new Coords(1, 1),
+            //    new Coords(1, 0),
+            //    new Coords(0, 0)
+            //    ));
             ImmutableList.Create(
                 new Coords(0, 0),
-                new Coords(0, 1),
-                new Coords(1, 1),
                 new Coords(1, 0),
+                new Coords(1, 1),
+                new Coords(0, 1),
                 new Coords(0, 0)
                 ));
 

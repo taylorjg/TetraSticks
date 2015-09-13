@@ -64,7 +64,7 @@ namespace TetraSticks.View
             var colour = TetraStickColours.TetraStickToColour(placedTetraStick.TetraStick);
             var path = new Path
             {
-                Data = CombineGeometries(placedTetraStick.Lines.Select(LineToPathGeometry).ToImmutableList()),
+                Data = CombineGeometries(placedTetraStick.Lines.Select(LineToGeometry).ToImmutableList()),
                 StrokeThickness = 1,
                 Stroke = new SolidColorBrush(Colors.Black),
                 Fill = new SolidColorBrush(colour),
@@ -73,27 +73,72 @@ namespace TetraSticks.View
             BoardCanvas.Children.Add(path);
         }
 
-        private PathGeometry LineToPathGeometry(IImmutableList<Coords> line)
+        private Geometry LineToGeometry(IImmutableList<Coords> line)
         {
             var lineSegments = LineToLineSegments(line);
             var combinedLineSegments = CombineConsecutiveLineSegments(lineSegments);
+            var segments = SortPathSegmentCollection(BuildPathSegmentCollection(combinedLineSegments));
+            return HandleClosedPaths(combinedLineSegments, segments);
+        }
 
-            var pathSegmentCollection =
-                HandleClosedPaths(
-                    line,
-                    SortPathSegmentCollection(
-                        BuildPathSegmentCollection(combinedLineSegments)));
+        private Geometry HandleClosedPaths(IImmutableList<Tuple<Coords, Coords, Direction>> combinedLineSegments, PathSegmentCollection segments)
+        {
+            var lastLineSegment = combinedLineSegments.Last();
+            var firstLineSegment = combinedLineSegments.First();
+
+            if (Equals(firstLineSegment.Item1, lastLineSegment.Item2))
+            {
+                Debug.Assert(segments.Count%2 == 0);
+                var halfLength = segments.Count/2;
+                var innerSegments = segments.Skip(halfLength).ToList();
+                var outerSegments = segments.Take(halfLength).ToList();
+
+                var cornerSegments = new PathSegmentCollection();
+                AddAppropriateCorner(cornerSegments, lastLineSegment, firstLineSegment.Item3);
+
+                outerSegments[0] = cornerSegments[0];
+                innerSegments.RemoveAt(0);
+                innerSegments.Add(cornerSegments[1]);
+
+                var outerGeometry = new PathGeometry
+                {
+                    Figures = new PathFigureCollection
+                    {
+                        new PathFigure
+                        {
+                            // TODO: hardcoded StartPoint!!!
+                            StartPoint = CoordsToInsetLowerLeftVertical(lastLineSegment.Item2),
+                            Segments = new PathSegmentCollection(outerSegments)
+                        }
+                    }
+                };
+
+                var innerGeometry = new PathGeometry
+                {
+                    Figures = new PathFigureCollection
+                    {
+                        new PathFigure
+                        {
+                            // TODO: hardcoded StartPoint!!!
+                            StartPoint = CoordsToInsetLowerRightVertical(lastLineSegment.Item2),
+                            Segments = new PathSegmentCollection(innerSegments)
+                        }
+                    }
+                };
+
+                return new CombinedGeometry(GeometryCombineMode.Exclude, outerGeometry, innerGeometry);
+            }
 
             return new PathGeometry
             {
                 Figures = new PathFigureCollection
-                {
-                    new PathFigure
                     {
-                        StartPoint = GetStartingPoint(combinedLineSegments),
-                        Segments = pathSegmentCollection
+                        new PathFigure
+                        {
+                            StartPoint = GetStartingPoint(combinedLineSegments),
+                            Segments = segments
+                        }
                     }
-                }
             };
         }
 
@@ -198,12 +243,6 @@ namespace TetraSticks.View
             return segments;
         }
 
-        private PathSegmentCollection HandleClosedPaths(IImmutableList<Coords> line, PathSegmentCollection segments)
-        {
-            if (!Equals(line.First(), line.Last())) return segments;
-            return segments;
-        }
-
         private static PathSegmentCollection SortPathSegmentCollection(PathSegmentCollection segments)
         {
             var n = segments.Count - 2;
@@ -288,6 +327,7 @@ namespace TetraSticks.View
             }
         }
 
+        // TODO: improve the signature of this method
         private void AddAppropriateCorner(PathSegmentCollection segments, Tuple<Coords, Coords, Direction> lineSegment, Direction nextDirection)
         {
             var currentDirection = lineSegment.Item3;
