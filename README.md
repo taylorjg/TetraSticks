@@ -2,10 +2,12 @@
 
 ## Description
 
-This project will be another demo program for [DlxLib](https://github.com/taylorjg/DlxLib).
-Currently, [DlxLib](https://github.com/taylorjg/DlxLib) does not support secondary columns
+This project is another demo program for [DlxLib](https://github.com/taylorjg/DlxLib).
+I am currently adding support for secondary columns to
+[DlxLib](https://github.com/taylorjg/DlxLib)
 as described in Donald E. Knuth's original
-[Dancing Links](http://arxiv.org/pdf/cs/0011047v1.pdf "Dancing Links") paper around pages 17-18 where he discusses puzzles involving tetra sticks.
+[Dancing Links](http://arxiv.org/pdf/cs/0011047v1.pdf "Dancing Links")
+paper around pages 17-18 where he discusses puzzles involving tetra sticks.
 
 There are 16 possible tetra sticks known as `F H I J L N O P R T U V W X Y Z`
 because of the similarity of the shapes to these letters.
