@@ -16,7 +16,7 @@ namespace TetraSticks.View
         private readonly Color _gridColour = Color.FromArgb(0x80, 0xCD, 0x85, 0x3F);
         private const int GridLineThickness = 4;
         private const int GridLineHalfThickness = GridLineThickness / 2;
-        private const int TetraStickThickness = 8;
+        private const int TetraStickThickness = 10;
         private const int TetraStickHalfThickness = TetraStickThickness / 2;
         private const int TetraStickInset = TetraStickThickness * 2;
         private const int TetraStickSmallCornerRadius = TetraStickInset - TetraStickHalfThickness;
@@ -88,13 +88,19 @@ namespace TetraSticks.View
 
             if (Equals(firstLineSegment.Item1, lastLineSegment.Item2))
             {
+                // Only the 'O' tetra stick has a closed line.
+                // The following code relies on the 'O' tetra stick
+                // line going Up then Right then Down then Left.
+                // Ideally, it should not rely on this but life is
+                // too short!
+
                 Debug.Assert(segments.Count%2 == 0);
                 var halfLength = segments.Count/2;
                 var innerSegments = segments.Skip(halfLength).ToList();
                 var outerSegments = segments.Take(halfLength).ToList();
 
                 var cornerSegments = new PathSegmentCollection();
-                AddAppropriateCorner(cornerSegments, lastLineSegment, firstLineSegment.Item3);
+                AddCornerDownThenRight(cornerSegments, lastLineSegment.Item2);
 
                 outerSegments[0] = cornerSegments[0];
                 innerSegments.RemoveAt(0);
@@ -106,7 +112,6 @@ namespace TetraSticks.View
                     {
                         new PathFigure
                         {
-                            // TODO: hardcoded StartPoint!!!
                             StartPoint = CoordsToInsetLowerLeftVertical(lastLineSegment.Item2),
                             Segments = new PathSegmentCollection(outerSegments)
                         }
@@ -119,7 +124,6 @@ namespace TetraSticks.View
                     {
                         new PathFigure
                         {
-                            // TODO: hardcoded StartPoint!!!
                             StartPoint = CoordsToInsetLowerRightVertical(lastLineSegment.Item2),
                             Segments = new PathSegmentCollection(innerSegments)
                         }
@@ -173,7 +177,7 @@ namespace TetraSticks.View
 
             var result = new List<Tuple<Coords, Coords, Direction>>();
 
-            // Can this be done using Aggregate ?
+            // TODO: Can this be done using Aggregate ?
             for (var i = 1; i < coords.Count; i++)
             {
                 var coords1 = coords[i - 1];
@@ -191,7 +195,7 @@ namespace TetraSticks.View
 
             var currentLineSegments = new List<Tuple<Coords, Coords, Direction>> {lineSegments[0]};
 
-            // Can this be done using Aggregate ?
+            // TODO: Can this be done using Aggregate ?
             for (var i = 1; i < lineSegments.Count; i++)
             {
                 var nextLineSegment = lineSegments[i];
