@@ -1,13 +1,26 @@
 
+
 ## Description
 
 This project will be another demo program for [DlxLib](https://github.com/taylorjg/DlxLib).
 Currently, [DlxLib](https://github.com/taylorjg/DlxLib) does not support secondary columns
 as described in Donald E. Knuth's original
-[Dancing Links](http://arxiv.org/pdf/cs/0011047v1.pdf "Dancing Links") paper around pages 17-18 when
-he discusses puzzles involving 15 of the 16 possible tetra sticks in a 5 x 5 square:
+[Dancing Links](http://arxiv.org/pdf/cs/0011047v1.pdf "Dancing Links") paper around pages 17-18 where he discusses puzzles involving tetra sticks.
+
+There are 16 possible tetra sticks known as `F H I J L N O P R T U V W X Y Z`
+because of the similarity of the shapes to these letters.
+It turns out that if one of `H J L N Y` is omitted, the remaining 15 tetra sticks
+can be arranged to form a 5 x 5 square:
 
 ![TetraSticks](https://raw.github.com/taylorjg/TetraSticks/master/Images/TetraSticks.png)
+
+Secondary columns are needed to prevent the tetra sticks from crossing:
+
+![TetraSticks2](https://raw.github.com/taylorjg/TetraSticks/master/Images/TetraSticks2.png)
+
+## Screenshot
+
+![Screenshot](https://raw.github.com/taylorjg/TetraSticks/master/Images/Screenshot.png)
 
 ## TODO: Implementation Steps
 
@@ -56,12 +69,12 @@ he discusses puzzles involving 15 of the 16 possible tetra sticks in a 5 x 5 squ
     - ~~only enabled when there is another solution to display~~
   - ~~add a label to indicate we are currently displaying solution 'n' of 'total'
   where 'total' auto-updates as the background thread finds more solutions~~
-- improve the drawing of the tetra sticks on the board (currently it is very basic and looks a bit naff)
+- ~~improve the drawing of the tetra sticks on the board (currently it is very basic and looks a bit naff)~~
 - add the ability to display each step of the algorithm ?
 - add a status bar
 - display messages in the status bar
 - display stats in the status bar (size of matrix and elapsed time to solve it)
-- Use the MVVM pattern (to at least some extent)
+- ~~Use the MVVM pattern~~
 
 ## Links
 
