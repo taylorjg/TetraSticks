@@ -31,7 +31,7 @@ Each tetra stick can be placed on the board with:
 * a specific orientation i.e. `North`, `South`, `East` or `West`
 * a specific reflection mode i.e. `Normal` or `MirrorY`
 
-When building the internal data structure, which in turn will be used to build the DLX matrix, we need to consider each valid location/orientation/reflection mode of each tetra stick. This is achieved with the following code (see RowBuilder.cs):
+When building the internal data structure, which in turn will be used to build the DLX matrix, we need to consider each valid location/orientation/reflection mode of each tetra stick. This is achieved with the following code (see [RowBuilder.cs](https://github.com/taylorjg/TetraSticks/blob/master/TetraSticks/Model/RowBuilder.cs)):
 
 ```C#
 public static IImmutableList<PlacedTetraStick> BuildRows(IImmutableList<TetraStick> tetraSticks)
@@ -62,7 +62,7 @@ public static IImmutableList<PlacedTetraStick> BuildRows(IImmutableList<TetraSti
 
 Notes:
 
-* We use `Distinct` with a specific comparer to remove duplicate rows e.g. `T` covers the same points when oriented `North` or `South`.
+* We use `Distinct` with a specific comparer to remove duplicate rows e.g. `O` covers the same points in all orientations.
 
 * We arbitrarily pick one tetra stick (the first one) and pin it so that we only consider it's `North` orientation. This is to avoid finding each solution four times where the only difference is the orientation of the board.
 
