@@ -7,10 +7,11 @@ I am currently adding support for secondary columns as described in Donald E. Kn
 [Dancing Links](http://arxiv.org/pdf/cs/0011047v1.pdf "Dancing Links")
 paper around pages 17-18 where he discusses puzzles involving tetra sticks.
 
-There are 16 possible tetra sticks known as `F H I J L N O P R T U V W X Y Z`
+A tetra stick is a shape composed of four short line segments of equal length.
+There are 16 distinct tetra sticks known as `F H I J L N O P R T U V W X Y Z`
 because of the similarity of the shapes to these letters.
 It turns out that if one of `H J L N Y` is omitted, the remaining 15 tetra sticks
-can be arranged to form a 5 x 5 square:
+can be arranged to form a 5 x 5 square. Here is one possible solution (omitting `L`):
 
 ![TetraSticks](https://raw.github.com/taylorjg/TetraSticks/master/Images/TetraSticks.png)
 
@@ -21,6 +22,49 @@ Secondary columns are needed to prevent the tetra sticks from crossing:
 ## Screenshot
 
 ![Screenshot](https://raw.github.com/taylorjg/TetraSticks/master/Images/Screenshot.png)
+
+## Building the Internal Data Structure
+
+Each tetra stick can be placed on the board with:
+
+* a specific location e.g. `(0, 0)`
+* a specific orientation i.e. `North`, `South`, `East` or `West`
+* a specific reflection mode i.e. `Normal` or `MirrorY`
+
+When building the internal data structure, which in turn will be used to build the DLX matrix, we need to consider each valid location/orientation/reflection mode of each tetra stick. This is achieved with the following code (see RowBuilder.cs):
+
+```C#
+public static IImmutableList<PlacedTetraStick> BuildRows(IImmutableList<TetraStick> tetraSticks)
+{
+    var locations = (
+        from x in Enumerable.Range(0, 5)
+        from y in Enumerable.Range(0, 5)
+        select new Coords(x, y)
+        ).ToImmutableList();
+    var orientations = Enum.GetValues(typeof (Orientation)).Cast<Orientation>().ToImmutableList();
+    var reflectionModes = Enum.GetValues(typeof (ReflectionMode)).Cast<ReflectionMode>().ToImmutableList();
+
+    var placedTetraSticks =
+        from tetraStick in tetraSticks
+        from location in locations
+        from orientation in orientations
+        from reflectionMode in reflectionModes
+        let placedTetraStick = new PlacedTetraStick(tetraStick, location, orientation, reflectionMode)
+        where IsFullyWithinGrid(placedTetraStick)
+        select placedTetraStick;
+
+    placedTetraSticks = placedTetraSticks.Distinct(new PlacedTetraStickComparer());
+    placedTetraSticks = PinFirstTetraStickToBeNorthOriented(tetraSticks, placedTetraSticks);
+
+    return placedTetraSticks.ToImmutableList();
+}
+```
+
+Notes:
+
+* We use `Distinct` with a specific comparer to remove duplicate rows e.g. `T` covers the same points when oriented `North` or `South`.
+
+* We arbitrarily pick one tetra stick (the first one) and pin it so that we only consider it's `North` orientation. This is to avoid finding each solution four times where the only difference is the orientation of the board.
 
 ## TODO: Implementation Steps
 
@@ -76,6 +120,7 @@ Secondary columns are needed to prevent the tetra sticks from crossing:
 - display messages in the status bar
 - display stats in the status bar (size of matrix and elapsed time to solve it)
 - ~~Use the MVVM pattern~~
+- issue a pre-release version of Dlxlib with support for secondary columns
 
 ## Links
 
