@@ -27,16 +27,16 @@ namespace TetraSticks.Model
                 select placedTetraStick;
 
             placedTetraSticks = placedTetraSticks.Distinct(new PlacedTetraStickComparer());
-            placedTetraSticks = PinFirstTetraStickToBeNorthOriented(tetraSticks, placedTetraSticks);
+            placedTetraSticks = PinTetraStickToBeOrientedNorth(tetraSticks.First(), placedTetraSticks);
 
             return placedTetraSticks.ToImmutableList();
         }
 
-        private static IEnumerable<PlacedTetraStick> PinFirstTetraStickToBeNorthOriented(
-            IEnumerable<TetraStick> tetraSticks,
+        private static IEnumerable<PlacedTetraStick> PinTetraStickToBeOrientedNorth(
+            TetraStick firstTetraStick,
             IEnumerable<PlacedTetraStick> placedTetraSticks)
         {
-            var firstTag = tetraSticks.First().Tag;
+            var firstTag = firstTetraStick.Tag;
 
             Func<PlacedTetraStick, bool> isNotFirst = pts => pts.TetraStick.Tag != firstTag;
             Func<PlacedTetraStick, bool> isOrientedNorth = pts => pts.Orientation == Orientation.North;

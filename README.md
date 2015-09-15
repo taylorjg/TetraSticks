@@ -54,7 +54,7 @@ public static IImmutableList<PlacedTetraStick> BuildRows(IImmutableList<TetraSti
         select placedTetraStick;
 
     placedTetraSticks = placedTetraSticks.Distinct(new PlacedTetraStickComparer());
-    placedTetraSticks = PinFirstTetraStickToBeNorthOriented(tetraSticks, placedTetraSticks);
+    placedTetraSticks = PinTetraStickToBeOrientedNorth(tetraSticks.First(), placedTetraSticks);
 
     return placedTetraSticks.ToImmutableList();
 }
