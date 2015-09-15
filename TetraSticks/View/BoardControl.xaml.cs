@@ -48,18 +48,12 @@ namespace TetraSticks.View
             DrawGridLines();
         }
 
-        public void Clear()
+        public void Reset()
         {
             RemoveChildrenWithTagType(TagType.TetraStick);
         }
 
-        public void DrawPlacedTetraSticks(IEnumerable<PlacedTetraStick> placedTetraSticks)
-        {
-            foreach (var placedTetraStick in placedTetraSticks)
-                DrawPlacedTetraStick(placedTetraStick);
-        }
-
-        private void DrawPlacedTetraStick(PlacedTetraStick placedTetraStick)
+        public void AddPlacedTetraStick(PlacedTetraStick placedTetraStick)
         {
             var colour = TetraStickColours.TetraStickToColour(placedTetraStick.TetraStick);
             var path = new Path
@@ -68,9 +62,86 @@ namespace TetraSticks.View
                 StrokeThickness = 1,
                 Stroke = new SolidColorBrush(Colors.Black),
                 Fill = new SolidColorBrush(colour),
-                Tag = TagType.TetraStick
+                Tag = MakeTag(TagType.TetraStick, placedTetraStick)
             };
             BoardCanvas.Children.Add(path);
+        }
+
+        public void AddPlacedTetraSticks(IEnumerable<PlacedTetraStick> placedTetraSticks)
+        {
+            foreach (var placedTetraStick in placedTetraSticks)
+                AddPlacedTetraStick(placedTetraStick);
+        }
+
+        private IImmutableList<FrameworkElement> GetTetraStickFrameworkElements()
+        {
+            return BoardCanvas.Children
+                .OfType<FrameworkElement>()
+                .Where(fe => GetTagType(fe) == TagType.TetraStick)
+                .ToImmutableList();
+        }
+
+        public void RemovePlacedTetraStick(PlacedTetraStick placedTetraStick)
+        {
+            // ReSharper disable once LoopCanBePartlyConvertedToQuery
+            foreach (var frameworkElement in GetTetraStickFrameworkElements())
+            {
+                if (GetPlacedTetraStick(frameworkElement).TetraStick.Tag != placedTetraStick.TetraStick.Tag) continue;
+                BoardCanvas.Children.Remove(frameworkElement);
+                return;
+            }
+        }
+
+        public bool IsPlacedTetraStickOnBoard(PlacedTetraStick placedTetraStick)
+        {
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            foreach (var frameworkElement in GetTetraStickFrameworkElements())
+                if (GetPlacedTetraStick(frameworkElement).TetraStick.Tag == placedTetraStick.TetraStick.Tag)
+                    return true;
+
+            return false;
+        }
+
+        public bool IsPlacedTetraStickOnBoardCorrectly(PlacedTetraStick placedTetraStick)
+        {
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            foreach (var frameworkElement in GetTetraStickFrameworkElements())
+            {
+                var pst = GetPlacedTetraStick(frameworkElement);
+                if (pst.TetraStick.Tag != placedTetraStick.TetraStick.Tag) continue;
+                return (Equals(pst.Location, placedTetraStick.Location) &&
+                        pst.Orientation == placedTetraStick.Orientation &&
+                        pst.ReflectionMode == placedTetraStick.ReflectionMode);
+            }
+
+            return false;
+        }
+
+        public void RemovePlacedTetraSticksOtherThan(IEnumerable<PlacedTetraStick> placedTetraSticks)
+        {
+            var tagsToKeep = placedTetraSticks.Select(pts => pts.TetraStick.Tag).ToImmutableList();
+
+            var elementsToRemove = GetTetraStickFrameworkElements()
+                .Where(fe => !tagsToKeep.Contains(GetPlacedTetraStick(fe).TetraStick.Tag))
+                .ToImmutableList();
+
+            foreach (var element in elementsToRemove)
+                BoardCanvas.Children.Remove(element);
+        }
+
+        private static TagType GetTagType(FrameworkElement frameworkElement)
+        {
+            return ((Tuple<TagType, PlacedTetraStick>)frameworkElement.Tag).Item1;
+        }
+
+        private static PlacedTetraStick GetPlacedTetraStick(FrameworkElement frameworkElement)
+        {
+            return ((Tuple<TagType, PlacedTetraStick>)frameworkElement.Tag).Item2;
+        }
+
+        private static Tuple<TagType, PlacedTetraStick> MakeTag(TagType tagType, PlacedTetraStick placedTetraStick)
+        {
+            return Tuple.Create(tagType, placedTetraStick);
         }
 
         private Geometry LineToGeometry(IImmutableList<Coords> line)
@@ -668,7 +739,7 @@ namespace TetraSticks.View
                     Y1 = row * sh + GridLineHalfThickness,
                     X2 = aw,
                     Y2 = row * sh + GridLineHalfThickness,
-                    Tag = TagType.GridLine
+                    Tag = MakeTag(TagType.GridLine, null)
                 };
                 BoardCanvas.Children.Add(line);
             }
@@ -684,7 +755,7 @@ namespace TetraSticks.View
                     Y1 = 0,
                     X2 = col * sw + GridLineHalfThickness,
                     Y2 = ah,
-                    Tag = TagType.GridLine
+                    Tag = MakeTag(TagType.GridLine, null)
                 };
                 BoardCanvas.Children.Add(line);
             }
@@ -692,23 +763,8 @@ namespace TetraSticks.View
 
         private void RemoveChildrenWithTagType(TagType tagType)
         {
-            var elementsToRemove = new List<UIElement>();
-
-            // ReSharper disable LoopCanBeConvertedToQuery
-            foreach (var element in BoardCanvas.Children)
-            {
-                var frameworkElement = element as FrameworkElement;
-                if (frameworkElement?.Tag as TagType? == tagType)
-                {
-                    elementsToRemove.Add(frameworkElement);
-                }
-            }
-            // ReSharper restore LoopCanBeConvertedToQuery
-
-            foreach (var element in elementsToRemove)
-            {
-                BoardCanvas.Children.Remove(element);
-            }
+            foreach (var fe in GetTetraStickFrameworkElements())
+                BoardCanvas.Children.Remove(fe);
         }
     }
 }

@@ -11,6 +11,7 @@ namespace TetraSticks.ViewModel
     public class PuzzleSolver
     {
         private readonly Action<IImmutableList<PlacedTetraStick>> _onSolutionFound;
+        private readonly Action<IImmutableList<PlacedTetraStick>> _onSearchStep;
         private readonly Action _onDoneSolving;
         private readonly TetraStick _tetraStickToOmit;
         private readonly SynchronizationContext _synchronizationContext;
@@ -19,12 +20,14 @@ namespace TetraSticks.ViewModel
         public PuzzleSolver(
             TetraStick tetraStickToOmit,
             Action<IImmutableList<PlacedTetraStick>> onSolutionFound,
+            Action<IImmutableList<PlacedTetraStick>> onSearchStep,
             Action onDoneSolving,
             SynchronizationContext synchronizationContext,
             CancellationToken cancellationToken)
         {
             _tetraStickToOmit = tetraStickToOmit;
             _onSolutionFound = onSolutionFound;
+            _onSearchStep = onSearchStep;
             _onDoneSolving = onDoneSolving;
             _synchronizationContext = synchronizationContext;
             _cancellationToken = cancellationToken;
@@ -46,9 +49,22 @@ namespace TetraSticks.ViewModel
             var matrix = DlxMatrixBuilder.BuildDlxMatrix(tetraSticks, rows);
             var dlx = new Dlx(_cancellationToken);
 
-            var solutions = dlx.Solve(matrix, d => d, r => r, 75);
+            dlx.SearchStep += (_, searchStepEventArgs) =>
+            {
+                var placedTetraSticks = searchStepEventArgs.RowIndexes.Select(idx => rows[idx]).ToImmutableList();
+                _synchronizationContext.Post(_onSearchStep, placedTetraSticks);
+            };
 
-            foreach (var solution in solutions)
+            //var solutions = dlx.Solve(matrix, d => d, r => r, 75);
+
+            //foreach (var solution in solutions)
+            //{
+            //    var placedTetraSticks = solution.RowIndexes.Select(idx => rows[idx]).ToImmutableList();
+            //    _synchronizationContext.Post(_onSolutionFound, placedTetraSticks);
+            //}
+
+            var solution = dlx.Solve(matrix, d => d, r => r, 75).First();
+
             {
                 var placedTetraSticks = solution.RowIndexes.Select(idx => rows[idx]).ToImmutableList();
                 _synchronizationContext.Post(_onSolutionFound, placedTetraSticks);

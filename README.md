@@ -70,8 +70,9 @@ Secondary columns are needed to prevent the tetra sticks from crossing:
   - ~~add a label to indicate we are currently displaying solution 'n' of 'total'
   where 'total' auto-updates as the background thread finds more solutions~~
 - ~~improve the drawing of the tetra sticks on the board (currently it is very basic and looks a bit naff)~~
-- add the ability to display each step of the algorithm ?
+- ~~add the ability to display each step of the algorithm~~
 - add a status bar
+- add an app icon
 - display messages in the status bar
 - display stats in the status bar (size of matrix and elapsed time to solve it)
 - ~~Use the MVVM pattern~~

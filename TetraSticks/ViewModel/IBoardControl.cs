@@ -6,7 +6,12 @@ namespace TetraSticks.ViewModel
     public interface IBoardControl
     {
         void DrawGrid();
-        void Clear();
-        void DrawPlacedTetraSticks(IEnumerable<PlacedTetraStick> placedTetraSticks);
+        void Reset();
+        void AddPlacedTetraStick(PlacedTetraStick placedTetraStick);
+        void AddPlacedTetraSticks(IEnumerable<PlacedTetraStick> placedTetraSticks);
+        void RemovePlacedTetraStick(PlacedTetraStick placedTetraStick);
+        bool IsPlacedTetraStickOnBoard(PlacedTetraStick placedTetraStick);
+        bool IsPlacedTetraStickOnBoardCorrectly(PlacedTetraStick placedTetraStick);
+        void RemovePlacedTetraSticksOtherThan(IEnumerable<PlacedTetraStick> placedTetraSticks);
     }
 }

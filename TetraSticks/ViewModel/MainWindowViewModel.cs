@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Collections.ObjectModel;
@@ -5,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Windows.Input;
+using System.Windows.Threading;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using TetraSticks.Model;
@@ -22,12 +24,43 @@ namespace TetraSticks.ViewModel
         private RelayCommand _cancelCommand;
         private bool _solving;
         private CancellationTokenSource _cancellationTokenSource;
+        private readonly Queue<IImmutableList<PlacedTetraStick>> _searchSteps = new Queue<IImmutableList<PlacedTetraStick>>();
+        private readonly DispatcherTimer _timer = new DispatcherTimer();
 
         public MainWindowViewModel(IBoardControl boardControl)
         {
             _boardControl = boardControl;
             _solutions = new ObservableCollection<IImmutableList<PlacedTetraStick>>();
             TetraStickToOmit = TetraSticksToOmit.First();
+
+            _timer.Tick += (_, __) => OnTick();
+            _timer.Interval = TimeSpan.FromMilliseconds(50);
+            _timer.Start();
+        }
+
+        private void OnTick()
+        {
+            if (!_searchSteps.Any()) return;
+            DisplaySearchStep(_searchSteps.Dequeue());
+        }
+
+        private void DisplaySearchStep(IImmutableList<PlacedTetraStick> placedTetraSticks)
+        {
+            foreach (var placedTetraStick in placedTetraSticks)
+            {
+                if (_boardControl.IsPlacedTetraStickOnBoard(placedTetraStick))
+                {
+                    if (_boardControl.IsPlacedTetraStickOnBoardCorrectly(placedTetraStick)) continue;
+                    _boardControl.RemovePlacedTetraStick(placedTetraStick);
+                    _boardControl.AddPlacedTetraStick(placedTetraStick);
+                }
+                else
+                {
+                    _boardControl.AddPlacedTetraStick(placedTetraStick);
+                }
+            }
+
+            _boardControl.RemovePlacedTetraSticksOtherThan(placedTetraSticks);
         }
 
         public static IEnumerable<TetraStick> TetraSticksToOmit => new[]
@@ -89,7 +122,8 @@ namespace TetraSticks.ViewModel
             Solutions.Clear();
             CurrentSolutionIndex = null;
 
-            _boardControl.Clear();
+            _boardControl.Reset();
+            _searchSteps.Clear();
             _cancellationTokenSource = new CancellationTokenSource();
 
             Solving = true;
@@ -97,6 +131,7 @@ namespace TetraSticks.ViewModel
             var puzzleSolver = new PuzzleSolver(
                 TetraStickToOmit,
                 OnSolutionFound,
+                OnSearchStep,
                 OnDoneSolving,
                 SynchronizationContext.Current,
                 _cancellationTokenSource.Token);
@@ -141,6 +176,11 @@ namespace TetraSticks.ViewModel
             RaiseCommonPropertyChangedEvents();
         }
 
+        private void OnSearchStep(IImmutableList<PlacedTetraStick> placedTetraSticks)
+        {
+            _searchSteps.Enqueue(placedTetraSticks);
+        }
+
         private void OnDoneSolving()
         {
             Solving = false;
@@ -148,8 +188,8 @@ namespace TetraSticks.ViewModel
 
         private void DisplaySolution(IEnumerable<PlacedTetraStick> solution)
         {
-            _boardControl.Clear();
-            _boardControl.DrawPlacedTetraSticks(solution);
+            _boardControl.Reset();
+            _boardControl.AddPlacedTetraSticks(solution);
         }
 
         private void RaiseCommonPropertyChangedEvents()
