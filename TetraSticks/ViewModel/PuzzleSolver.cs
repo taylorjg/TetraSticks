@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using DlxLib;
+using TetraSticks.Extensions;
 using TetraSticks.Model;
 
 namespace TetraSticks.ViewModel

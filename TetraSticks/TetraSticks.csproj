@@ -96,7 +96,7 @@
     <Compile Include="ViewModel\IBoardControl.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
     <Compile Include="ViewModel\PuzzleSolver.cs" />
-    <Compile Include="ViewModel\SynchronizationContextExtensions.cs" />
+    <Compile Include="Extensions\SynchronizationContextExtensions.cs" />
     <Compile Include="View\App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>

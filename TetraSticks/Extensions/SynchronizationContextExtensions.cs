@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace TetraSticks.ViewModel
+namespace TetraSticks.Extensions
 {
     public static class SynchronizationContextExtensions
     {
