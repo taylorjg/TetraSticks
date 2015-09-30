@@ -168,10 +168,10 @@ namespace TetraSticks.ViewModel
 
         private void OnSolutionFound(IImmutableList<PlacedTetraStick> solution)
         {
-            _solutions.Add(solution);
+            //_solutions.Add(solution);
 
-            if (CurrentSolutionIndex == null)
-                OnShowNextSolution();
+            //if (CurrentSolutionIndex == null)
+            //    OnShowNextSolution();
 
             RaiseCommonPropertyChangedEvents();
         }
