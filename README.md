@@ -3,7 +3,7 @@
 ## Description
 
 This project is another demo program for [DlxLib](https://github.com/taylorjg/DlxLib).
-I am currently adding support for secondary columns as described in Donald E. Knuth's original
+I recently added support for secondary columns as described in Donald E. Knuth's original
 [Dancing Links](http://arxiv.org/pdf/cs/0011047v1.pdf "Dancing Links")
 paper around pages 17-18 where he discusses puzzles involving tetra sticks.
 
@@ -120,7 +120,6 @@ Notes:
 - display messages in the status bar
 - display stats in the status bar (size of matrix and elapsed time to solve it)
 - ~~Use the MVVM pattern~~
-- issue a pre-release version of Dlxlib with support for secondary columns
 
 ## Links
 
